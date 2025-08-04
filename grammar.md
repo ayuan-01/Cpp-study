@@ -8,8 +8,7 @@ bool flag = true;
 
 - 命名空间的概念
 
-​		最常用的是标准库的命名空间了。在C++项目中，同一个函数名称可能会在不同的文件中多次出现，为了解决这种命名冲突，就有了命名空间的概念。
-​		std是C++标准库的命名空间，是一个庞大的工具集。
+最常用的是标准库的命名空间了。在C++项目中，同一个函数名称可能会在不同的文件中多次出现，为了解决这种命名冲突，就有了命名空间的概念。std是C++标准库的命名空间，是一个庞大的工具集。
 
 ```cpp
 // 使用std命名空间的内容
@@ -54,7 +53,7 @@ std::cout << x;      // 全局的x
 std::cout << A::x;   // A类中的x
 ```
 
-1. **::**表示作用域解析运算符，用于指明空间或者类的作用域。
+1. **`::`**表示作用域解析运算符，用于指明空间或者类的作用域。
 
 2. **cout**对象表述标准输出流。
 
@@ -90,20 +89,20 @@ for (int& n : vec) {
 
 ```cpp
 /* 类与面向对象 */
-class	定义类
-struct	定义结构体（默认 public）
-public	公有访问权限
-private	私有访问权限（类默认）
+class		定义类
+struct		定义结构体（默认 public）
+public		公有访问权限
+private		私有访问权限（类默认）
 protected	受保护访问权限
-virtual	虚函数（支持多态）
+virtual		虚函数（支持多态）
 override	明确重写父类虚函数（C++11）
-final	禁止子类重写（C++11）
-this	当前对象指针
-new	动态分配内存
-delete	释放动态内存
-friend	友元函数/类
+final		禁止子类重写（C++11）
+this		当前对象指针
+new			动态分配内存
+delete		释放动态内存
+friend		友元函数/类
 explicit	禁止构造函数隐式转换
-inline	请求内联函数
+inline		请求内联函数
     
 /* 模板和泛型编程 */
 template	模板定义
@@ -119,9 +118,11 @@ std::string	字符串（C++类）
 
 - new
 
-  核心功能是在堆上分配内存，并返回指向该内存的一个指针。销毁使用delete。主要功能有两个：
-  1. 为单个对象分配内存。
-  2. 为数组分配内存。
+
+核心功能是在堆上分配内存，并返回指向该内存的一个指针。销毁使用delete。主要功能有两个：
+1. 为单个对象分配内存。
+2. 为数组分配内存。
+
 ```cpp
 // 为单个对象分配内存
 pointer = new TypeName;
@@ -181,7 +182,7 @@ delete[] arr;           // 正确释放数组
 int* p = new int;
 ```
 
-- new和mellocde区别
+- new和melloc的区别
 
 1. new可以自动计算内存大小
 2. new可以自动调用构造函数，delete可以自动调用析构函数
@@ -809,6 +810,11 @@ int main() {
 调用：
 
 ```cpp
+class MyClass {
+public:
+    static void StaticFunction(); // 静态成员函数声明
+};
+
 MyClass::StaticFunction();  // 直接通过类名调用
 ```
 
@@ -960,6 +966,7 @@ std::ostream& operator<<(std::ostream& os, const Vector& v) {
     return os;
 }
 
+
 std::istream& operator>>(std::istream& is, Vector& v) {
     is >> v.x >> v.y;
     return is;
@@ -972,14 +979,34 @@ Vector& Vector::operator++() {
     return *this;
 }
 
-// 后置 ++（用 int 参数区分）
+// 后置 ++（用 int 参数区分，没有逻辑原因，就是一个占位参数，用于区分）
 Vector Vector::operator++(int) {
     Vector temp = *this;
     ++(*this);
     return temp;
 }
 
+// 关系运算符重载
+bool operator<(const Person& other) const {
+    return age < other.age;
+}
+
+bool operator>(const Person& other) const {
+    return age > other.age;
+}
+
+bool operator<=(const Person& other) const {
+    return age <= other.age;
+}
+
+bool operator>=(const Person& other) const {
+    return age >= other.age;
+}
+
 ```
+
+输入输出流重载说明：`std::ostream& operator<<(std::ostream& os, const Vector& v)`
+首先这是一个函数，函数名字是`operator<<`，函数的输出类型是`std::ostream&`，输入类型是`std::ostream& const Vector& v`相当于`(std::cout << v)`的重载后的输出可以是`std::cout`以便格式化输出`Vector`类型之后还能够继续链式输出其他内容。
 
 ```cpp
 // 输入输出流重载
@@ -1017,4 +1044,585 @@ int main() {
     return 0;
 }
 ```
+
+#### 函数运算符重载
+
+```cpp
+class Adder {
+public:
+    int operator()(int a, int b) {
+        return a + b;
+    }
+};
+
+Adder add;
+int result = add(3, 4); // 看起来像函数调用，实际是调用 operator()
+
+// 匿名函数对象
+std::cout << Adder()(3, 4) << std::endl;
+```
+
+## 继承
+
+概念：继承允许我们创建一个新类（派生类），这个新类会**继承**一个基类的**属性**和**行为**，实现代码的重用和类之间的层次关系。
+
+核心思想：提取出一类物品的公共属性和行为。比如猫狗鸟等都属于动物，动物就可以作为父类。
+
+继承是多态的基础。
+
+子类可以对父类的成员函数进行重写。虚函数的重写是为了实现多态。
+
+### 语法格式：
+
+```cpp
+// class Manager : public Employee {
+#include <iostream>
+#include <string>
+
+// 基类：员工
+class Employee {
+public:
+    // 基类的构造函数
+    Employee(std::string name, int id, double salary) 
+        : m_name(name), 
+    	m_id(id), 
+    	m_salary(salary) {}
+
+    // 基类的成员函数
+    void work() {
+        std::cout << m_name << " (ID: " << m_id << ") is working." << std::endl;
+    }
+
+    void showInfo() {
+        std::cout << "Name: " << m_name << ", ID: " << m_id << ", Salary: " << m_salary << std::endl;
+    }
+
+protected: // protected成员在基类和派生类中都可以访问
+    std::string m_name;
+    int m_id;
+    double m_salary;
+};
+
+// 派生类：经理，公有继承自Employee
+class Manager : public Employee {
+public:
+    // 派生类的构造函数，需要调用基类的构造函数来初始化基类部分
+    Manager(std::string name, int id, double salary, double bonus)
+        : Employee(name, id, salary), 
+    	m_bonus(bonus) {} // 初始化列表
+
+    // 派生类新增的成员函数
+    void manageTeam() {
+        std::cout << m_name << " is managing the team." << std::endl;
+    }
+
+    // 派生类可以重写（覆盖）基类的函数
+    void showInfo() {
+        // 先调用基类的showInfo()显示共同信息
+        Employee::showInfo(); // 使用作用域解析符调用基类版本
+        // 再显示派生类特有的信息
+        std::cout << "Bonus: " << m_bonus << std::endl;
+    }
+
+private:
+    // 派生类新增的成员变量
+    double m_bonus;
+};
+
+int main() {
+    Employee emp("Alice", 1001, 8000.0);
+    emp.work(); // Alice (ID: 1001) is working.
+    emp.showInfo(); // Name: Alice, ID: 1001, Salary: 8000
+
+    std::cout << "---------------------" << std::endl;
+
+    Manager mgr("Bob", 2001, 15000.0, 5000.0);
+    mgr.work(); // Bob (ID: 2001) is working. (继承自Employee)
+    mgr.manageTeam(); // Bob is managing the team. (Manager自己的)
+    mgr.showInfo(); // 调用的是Manager重写后的版本
+    // Name: Bob, ID: 2001, Salary: 15000
+    // Bonus: 5000
+
+    return 0;
+}
+```
+
+### 继承方式
+
+有**公有，保护，私有**三种方式。继承方式决定了**基类中的成员**在**派生类中**的访问权限。**继承方式是为了限制“外部”对“基类部分”的访问，而不是限制派生类内部对基类成员的访问。**总之，派生类对基类的访问权限取决于基类和继承方式的最小权限。只有两个都是public时外部才能访问。
+
+无论哪种继承方式，**基类的 `private` 成员永远无法被派生类直接访问**。它们虽然被继承了（存在于派生类对象中），但对派生类来说是“不可见”的。派生类只能通过基类提供的 `public` 或 `protected` 接口来间接访问它们。
+
+### 继承中的构造和析构函数
+
+构造函数和析构函数不能被继承，但是在创建派生类对象时，基类的构造函数会自动被调用。
+
+构造函数的调用顺序：先调用基类的构造函数，再调用派生类自己的构造函数。
+
+```cpp
+// Manager的构造函数
+Manager(std::string name, int id, double salary, double bonus)
+    : Employee(name, id, salary), // 在初始化列表中调用基类构造函数
+      m_bonus(bonus) {            // 初始化派生类自己的成员
+    // 函数体
+}
+```
+
+析构函数的调用顺序相反。
+
+### 继承的内存布局
+
+**派生类对象包含了基类的所有非静态成员变量，以及派生类自己新增的非静态成员变量。**这些成员在内存中通常是连续存放的，基类的部分在前，派生类的部分在后。
+
+成员函数（包括虚函数）并不存储在每个对象中。它们存储在代码段。**每个对象中只存储一个指向虚函数表的指针**（如果类有虚函数），通过这个指针来找到正确的函数版本。
+
+### 继承中的静态成员
+
+**无论继承出多少个派生类，整个继承体系中只有一个静态成员的实例**。
+
+- **静态成员变量**：被所有基类和派生类的对象共享。
+- **静态成员函数**：没有 `this` 指针，**只能访问静态成员**。它同样被继承，但无法被重写为虚函数（因为虚函数依赖于 `this` 指针和虚表）。
+
+静态成员函数可以通过基类或者派生类的作用域来访问。
+
+```cpp
+class Base {
+public:
+    static int s_count;
+    static void printCount() {
+        std::cout << "Count: " << s_count << std::endl;
+    }
+};
+int Base::s_count = 0; // 静态成员初始化
+
+class Derived : public Base {
+    // ...
+};
+
+int main() {
+    Base b;
+    Derived d;
+
+    b.s_count = 10;
+    d.s_count = 20; // 修改的是同一个 s_count
+
+    Base::printCount(); // 输出 Count: 20
+    Derived::printCount(); // 输出 Count: 20
+
+    return 0;
+}
+```
+
+### 多继承和菱形继承问题
+
+多继承会引入复杂性，最主要的问题是**命名冲突**。如果多个基类中有同名的成员，那么在派生类中访问时，必须使用作用域解析符来明确指出要访问哪个基类的成员。
+
+```cpp
+class A {
+public:
+    void foo() { std::cout << "A::foo()" << std::endl; }
+};
+
+class B {
+public:
+    void foo() { std::cout << "B::foo()" << std::endl; }
+};
+
+class C : public A, public B {
+    // ...
+};
+
+int main() {
+    C c;
+    // c.foo(); // 错误！对 'foo' 的访问不明确
+    c.A::foo(); // 正确，调用A的foo
+    c.B::foo(); // 正确，调用B的foo
+    return 0;
+}
+```
+
+#### 菱形继承
+
+当一个派生类通过多个路径继承同一个基类时，就会形成菱形结构。
+
+```cpp
+/******************************************************************************************************
+                                                  Person
+                                                 /      \
+                                              Teacher   Student
+                                                 \      /
+                                              TeachingAssistant
+Person 类
+Teacher 类继承 Person
+Student 类继承 Person
+******************************************************************************************************/
+class Person {
+public:
+    int m_age;
+};
+
+class Teacher : public Person {};
+class Student : public Person {};
+
+class TeachingAssistant : public Teacher, public Student {};
+
+int main() {
+    TeachingAssistant ta;
+    // ta.m_age = 25; // 错误！对 'm_age' 的访问不明确
+    ta.Teacher::m_age = 25; // 修改Teacher路径上的m_age
+    ta.Student::m_age = 26;  // 修改Student路径上的m_age
+    // 现在ta对象中有两个不同的m_age值，数据不一致了！
+    return 0;
+}
+```
+
+菱形继承会导致，内存浪费，数据不一致，访问二义性。
+
+#### 虚继承
+
+为解决菱形继承的问题，引入的虚继承。
+
+**作用**：虚继承确保在继承体系中，无论被继承多少次，共享的基类（如 `Person`）只会有**一个实例**。
+
+**语法**：在继承路径的“腰部”使用 `virtual` 关键字。即在直接继承共同基类的派生类（`Teacher` 和 `Student`）的继承声明中使用 `virtual`。
+
+```cpp
+class Person {
+public:
+    int m_age;
+};
+
+// 使用虚继承
+class Teacher : virtual public Person {};
+class Student : virtual public Person {};
+
+class TeachingAssistant : public Teacher, public Student {};
+
+int main() {
+    TeachingAssistant ta;
+    ta.m_age = 25; // 正确！不再有二义性，因为只有一个m_age
+
+    std::cout << ta.m_age << std::endl; // 输出 25
+    std::cout << ta.Teacher::m_age << std::endl; // 输出 25 (同一个)
+    std::cout << ta.Student::m_age << std::endl;  // 输出 25 (同一个)
+
+    return 0;
+}
+```
+
+**虚继承的原理（简述）**：
+虚继承的实现通常通过**虚基类指针**和**虚基类表**。
+
+- 每个继承了虚基类的类（如 `Teacher`, `Student`）的对象中，会多一个**虚基类指针**。
+- 这个指针指向一个**虚基类表**，表中记录了从当前对象位置到共享的虚基类（`Person`）子对象的偏移量。
+- 这样，无论通过 `Teacher` 还是 `Student` 的路径，都能通过查表找到同一个 `Person` 子对象。
+
+<img src="./Figure/virtual.png"  alt="菱形继承内存布局" width="1000">
+
+### 同名成员
+
+分为同名成员变量的处理和同名成员函数的处理。
+
+只要派生类中存在与基类同名的函数，那基类中所有的重载函数都会被隐藏，必须使用作用域的方式调用。
+
+核心思想是：**派生类的同名成员会“隐藏”基类的同名成员，使得通过派生类对象直接访问时，只能访问到派生类自己的版本。**
+
+```cpp
+#include <iostream>
+#include <string>
+
+class Base {
+public:
+    int m_value; // 基类的成员变量
+
+    Base() : m_value(100) {
+        std::cout << "Base constructor, m_value = " << m_value << std::endl;
+    }
+};
+
+class Derived : public Base {
+public:
+    int m_value; // 派生类的同名成员变量
+
+    Derived() : m_value(200) {
+        std::cout << "Derived constructor, m_value = " << m_value << std::endl;
+    }
+
+    void printValues() {
+        std::cout << "--- Inside Derived::printValues ---" << std::endl;
+        // 直接访问 m_value，访问的是派生类自己的 m_value
+        std::cout << "Derived's m_value = " << m_value << std::endl; 
+
+        // 使用作用域解析运算符 :: 来访问被隐藏的基类成员
+        std::cout << "Base's m_value    = " << Base::m_value << std::endl; 
+        std::cout << "----------------------------------" << std::endl;
+    }
+};
+
+int main() {
+    Derived d;
+    d.printValues();
+
+    // 通过对象直接访问
+    std::cout << "--- Accessing via object ---" << std::endl;
+    std::cout << "d.m_value = " << d.m_value << std::endl; // 访问的是 Derived::m_value
+
+    // 如何通过对象访问基类的 m_value？
+    // 必须使用作用域解析运算符
+    std::cout << "d.Base::m_value = " << d.Base::m_value << std::endl; // 访问的是 Base::m_value
+
+    return 0;
+}
+```
+
+同名成员函数的处理比成员变量更复杂，因为它涉及到**函数重载**和**函数重写（覆盖）**的概念。C++的规则是：**只要函数名相同，基类的所有同名函数都会被隐藏，无论参数列表是否相同。**
+
+这是一个非常重要的区别，很多人会误以为如果参数列表不同，就会构成重载。**但请注意：重载只能发生在同一个作用域内。** 基类和派生类是不同的作用域。
+
+```cpp
+#include <iostream>
+
+class Base {
+public:
+    // 基类中有三个同名但参数不同的函数
+    void display() {
+        std::cout << "Base::display() (no args)" << std::endl;
+    }
+    void display(int i) {
+        std::cout << "Base::display(int) with i = " << i << std::endl;
+    }
+    void display(double d) {
+        std::cout << "Base::display(double) with d = " << d << std::endl;
+    }
+};
+
+class Derived : public Base {
+public:
+    // 派生类中定义了一个同名函数
+    void display(int i) {
+        std::cout << "Derived::display(int) with i = " << i << std::endl;
+    }
+};
+
+int main() {
+    Derived d;
+
+    std::cout << "Trying to call display() functions from a Derived object:" << std::endl;
+
+    // d.display();       // 编译错误！ Base::display() 被隐藏了
+    // d.display(3.14);   // 编译错误！ Base::display(double) 被隐藏了
+
+    d.display(10); // OK，调用的是 Derived::display(int)
+    
+    std::cout << "\nCalling Base's hidden functions explicitly:" << std::endl;
+    
+    // 使用作用域解析运算符调用基类的版本
+    d.Base::display();        // OK
+    d.Base::display(20);      // OK
+    d.Base::display(3.14);    // OK
+
+    return 0;
+}
+```
+
+如果我们只是想在派生类中“暴露”基类的某个重载版本，而不是重新实现它，可以使用`using`声明。这会把基类的函数名“引入”到派生类的作用域中，使其参与重载解析。
+
+```cpp
+class Derived : public Base {
+public:
+    // 将 Base 类中所有的 display 函数引入到 Derived 的作用域
+    using Base::display; 
+
+    // 现在，Derived 类中相当于有了以下函数：
+    // void display(); (from Base)
+    // void display(int); (from Base)
+    // void display(double); (from Base)
+    // void display(int); (defined below)
+
+    // 这个 Derived::display(int) 会和 Base::display(int) 形成重载
+    void display(int i) {
+        std::cout << "Derived::display(int) with i = " << i << std::endl;
+    }
+};
+
+int main() {
+    Derived d;
+    d.display();       // 现在可以了！调用 Base::display()
+    d.display(3.14);   // 现在可以了！调用 Base::display(double)
+    d.display(10);     // 调用 Derived::display(int) (通常更精确的匹配或非虚函数优先)
+    return 0;
+}    
+```
+
+## 多态
+
+核心思想：同一个函数调用，作用于不同的对象，会产生不同的行为。
+
+静态多态：也称为编译时多态。在程序编译期间就确定了具体要调用哪个函数。主要通过**函数重载**和**模板**实现。
+
+动态多态：也称为运行时多态。在程序运行期间，根据对象的实际类型来动态地确定调用哪个函数。主要通过**继承**和**虚函数**实现。
+
+绝大多数情况下指的是**动态多态**。
+
+动态多态实现的三个关键要素：**继承，虚函数，基类指针或引用。**
+
+### 虚指针和虚函数表
+
+当一个类中存在至少一个虚函数时，编译器会为这个类创建一个虚函数表。这个表是一个静态的、函数指针的数组。
+
+虚指针时在创建含虚函数的类的对象时，编译器在对象的内存布局中插入的一个额外指针`vptr`指向该对象所属类的虚函数表。
+
+编译时：
+1. 编译器为Base类创建一个虚函数表，Base::speak()的地址被放入表中。
+2. 编译器为Derived类也创建一个虚函数表。由于Derived重写了speak()，所以Derived::speak()的地址被放入表中，覆盖了从基类继承来的位置。
+3. 当创建Base对象时，其vptr指向Base的虚函数表。
+4. 当创建Derived对象时，其vptr指向Derived的虚函数表。
+
+运行时：
+当你通过基类指针`ptr`调用`ptr->speak()`时，程序并不会在编译时就硬编码要调用`Base::speak()`。
+1. 获取ptr所指向的对象。
+2. 找到该对象内部的vptr。
+3. 通过vptr找到对应的虚函数表。
+4. 在虚函数表中，找到speak()函数对应的条目。
+5. 调用该条目中存储的函数地址。
+
+因为ptr在运行时可能指向Base对象，也可能指向Derived对象，所以它内部的vptr也就分别指向了不同的虚函数表，从而最终调用了不同版本的speak()函数。这就是“动态绑定”或“迟绑定”的精髓。
+
+```cpp
+#include <iostream>
+#include <string>
+
+// 1. 基类
+class Animal {
+public:
+    // 2. 虚函数
+    // 使用 virtual 关键字声明，表示这个函数可以被派生类重写
+    virtual void speak() const {
+        std::cout << "Some generic animal sound..." << std::endl;
+    }
+
+    // 虚析构函数！非常重要！后面会讲为什么。
+    virtual ~Animal() {
+        std::cout << "Animal destructor called." << std::endl;
+    }
+};
+
+// 1. 继承
+class Dog : public Animal {
+public:
+    // 3. 重写 虚函数
+    // 函数签名必须与基类的虚函数完全一致（除了协变返回类型，这里不展开）
+    // override 关键字是C++11引入的，强烈推荐使用！
+    // 它可以让编译器检查你是否真的重写了一个基类的虚函数，防止因拼写错误等问题导致隐藏而非重写。
+    void speak() const override {
+        std::cout << "Woof! Woof!" << std::endl;
+    }
+
+    ~Dog() {
+        std::cout << "Dog destructor called." << std::endl;
+    }
+};
+
+class Cat : public Animal {
+public:
+    void speak() const override {
+        std::cout << "Meow!" << std::endl;
+    }
+
+    ~Cat() {
+        std::cout << "Cat destructor called." << std::endl;
+    }
+};
+
+// 一个统一的接口，它不关心传进来的是Dog还是Cat，只要是Animal就行
+void letAnimalSpeak(const Animal& animal) { // 使用基类引用
+    animal.speak(); // 发生动态多态调用
+}
+
+int main() {
+    Dog myDog;
+    Cat myCat;
+
+    std::cout << "--- Direct calls ---" << std::endl;
+    myDog.speak(); // 直接调用，调用Dog::speak()
+    myCat.speak(); // 直接调用，调用Cat::speak()
+
+    std::cout << "\n--- Polymorphic calls via reference ---" << std::endl;
+    letAnimalSpeak(myDog); // 传入Dog对象，内部调用Dog::speak()
+    letAnimalSpeak(myCat); // 传入Cat对象，内部调用Cat::speak()
+
+    std::cout << "\n--- Polymorphic calls via pointer ---" << std::endl;
+    // 4. 使用基类指针
+    Animal* ptr1 = new Dog();
+    Animal* ptr2 = new Cat();
+
+    ptr1->speak(); // 通过基类指针调用，调用Dog::speak()
+    ptr2->speak(); // 通过基类指针调用，调用Cat::speak()
+
+    std::cout << "\n--- Destructing objects ---" << std::endl;
+    delete ptr1; // 如果Animal的析构函数不是virtual，这里只会调用Animal的析构函数，导致Dog的析构函数不被调用，内存泄漏！
+    delete ptr2;
+
+    return 0;
+}
+```
+
+### 虚析构函数
+
+如果一个基类的指针指向一个派生类的对象，当通过这个基类指针调用delete时，如果派生类的析构函数没有`virtual`，就无法清除派生类的资源。
+
+**黄金法则**：**如果一个类设计出来是为了被继承，并且它拥有虚函数，那么它的析构函数也必须是虚函数。**
+
+###  override和final关键字
+
+override是一个说明符，说明当前函数是重写的基类的一个虚函数（编译器会对重写虚函数的正确与否进行检查）。
+
+final说明符，在函数后面告诉编译器不能被进一步的派生类重写。放在类名后，表示该类不能被继承。
+
+### 纯虚函数
+
+派生类必须对该函数进行重写。如果一个类中包含了至少一个纯虚函数，那么这个类就被称为**抽象类**。
+
+**抽象类不能被实例化**。你不能创建一个抽象类的对象。抽象类通常被用作基类，定义一个通用的接口规范，强制所有派生类都必须实现这个接口。它是实现“接口与实现分离”设计思想的强大工具。
+
+```cpp
+// Shape 是一个抽象类，定义了所有“形状”应该有的接口
+class Shape {
+public:
+    // 纯虚函数，计算面积
+    virtual double area() const = 0;
+    // 纯虚函数，绘制形状
+    virtual void draw() const = 0;
+    
+    virtual ~Shape() = default; // 虚析构函数，使用default生成默认实现
+};
+
+class Circle : public Shape {
+private:
+    double radius;
+public:
+    Circle(double r) : radius(r) {}
+
+    // 必须重写所有纯虚函数，否则Circle也会成为抽象类
+    double area() const override {
+        return 3.14159 * radius * radius;
+    }
+    void draw() const override {
+        std::cout << "Drawing a circle." << std::endl;
+    }
+};
+
+// Shape s; // 错误！Shape是抽象类，不能实例化
+Circle c(10); // 正确，Circle重写了所有纯虚函数，是具体类
+Shape* ptr = new Circle(5); // 正确，基类指针可以指向派生类对象
+ptr->draw(); // 调用 Circle::draw()
+delete ptr;
+```
+
+### 多态的优势
+
+1. 可扩展性：当你需要增加一个新的派生类时（比如增加一个`Bird`类），你只需要编写`Bird`类本身并实现它自己的`speak()`函数。**调用多态行为的代码（如`letAnimalSpeak`函数）完全不需要任何修改！** 这使得系统维护和升级变得异常轻松。
+2. 解耦：多态使得高层模块（调用方）只依赖于基类的抽象接口，而不依赖于具体的派生类实现。这大大降低了模块间的耦合度，符合“依赖倒置原则”（DIP）。
+3. 代码简洁与复用：你可以用统一的代码处理多种不同类型的对象，避免了大量的if-else或switch语句来进行类型判断和分支处理。代码更简洁，逻辑更清晰。
+4. 框架设计：几乎所有的大型C++框架（如Qt、MFC、游戏引擎等）都深度依赖多态。框架定义了一系列抽象基类（接口），用户通过继承这些基类并实现其虚函数，来将自己的代码“挂载”到框架中运行。
 
