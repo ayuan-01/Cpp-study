@@ -1626,3 +1626,520 @@ delete ptr;
 3. 代码简洁与复用：你可以用统一的代码处理多种不同类型的对象，避免了大量的if-else或switch语句来进行类型判断和分支处理。代码更简洁，逻辑更清晰。
 4. 框架设计：几乎所有的大型C++框架（如Qt、MFC、游戏引擎等）都深度依赖多态。框架定义了一系列抽象基类（接口），用户通过继承这些基类并实现其虚函数，来将自己的代码“挂载”到框架中运行。
 
+## 模板
+
+**泛型编程：**泛型编程的思想是编写与类型无关的代码。意味着你可以编写一个通用的算法或数据结构，而不用预先指定它要操作的具体数据类型（如`int`, `double`, `string`等）。当你使用这个模板时，编译器会根据你提供的具体类型，自动生成一个对应类型的、可执行的代码版本。
+
+### 函数模板
+
+模板声明: `template <typename T>`，告诉编译器接下来的东西是一个模板。
+
+`typename T`：定义了一个模板参数`T`。`T`是一个占位符，代表任何数据类型。`typename`关键字表明`T`是一个类型名。你也可以使用`class`关键字（`template <class T>`），在大多数情况下它们是等价的，但现代C++更推荐使用`typename`，因为它语义更清晰。
+
+```cpp
+#include <iostream>
+#include <string>
+
+// 定义一个函数模板
+template <typename T> // T 是一个类型模板参数
+void mySwap(T& a, T& b) {
+    T temp = a;
+    a = b;
+    b = temp;
+    std::cout << "通用版本的 mySwap 被调用。" << std::endl;
+}
+
+int main() {
+    int x = 10, y = 20;
+    mySwap(x, y); // 使用 int 类型
+    std::cout << "x: " << x << ", y: " << y << std::endl; // x: 20, y: 10
+
+    double d1 = 1.1, d2 = 2.2;
+    mySwap(d1, d2); // 使用 double 类型
+    std::cout << "d1: " << d1 << ", d2: " << d2 << std::endl; // d1: 2.2, d2: 1.1
+
+    std::string s1 = "hello", s2 = "world";
+    mySwap(s1, s2); // 使用 std::string 类型
+    std::cout << "s1: " << s1 << ", s2: " << s2 << std::endl; // s1: world, s2: hello
+
+    return 0;
+}
+```
+
+#### 过程说明
+
+1. 推导模板参数：编译的时候看到传入的参数`xy`都是`int`类型的，于是推导出模板参数`T`应该是`int`。
+2. 实例化：编译器使用`int`换掉所有的占位符`T`，生成一个全新的，专门处理`int`的函数。
+3. 编译这个新生成的函数。
+
+### 类模板
+
+类模板允许定义一个与类型无关的类家族。最经典的例子就是标准库中的容器，如`std::vector`, `std::list`, `std::map`等。
+
+```cpp
+template <typename T>
+class ClassName {
+public:
+    // 类成员可以使用 T
+    T memberVar;
+    void memberFunction(T param);
+    // ...
+};
+```
+
+#### 类模板的实例化
+
+```cpp
+Array<int> intArray(5);
+```
+
+一个简单的Array类模板
+
+```cpp
+#include <iostream>
+#include <stdexcept> // 用于 std::out_of_range
+
+// 定义一个类模板
+template <typename T>
+class Array {
+private:
+    T* m_data;
+    int m_size;
+
+public:
+    // 构造函数
+    Array(int size) : m_size(size) {
+        if (size <= 0) {
+            throw std::invalid_argument("Array size must be positive.");
+        }
+        m_data = new T[size]; // 根据类型 T 分配内存
+    }
+
+    // 析构函数
+    ~Array() {
+        delete[] m_data;
+    }
+
+    // 访问元素 (重载 [])
+    T& operator[](int index) {
+        if (index < 0 || index >= m_size) {
+            throw std::out_of_range("Index out of range.");
+        }
+        return m_data[index];
+    }
+
+    // 获取大小
+    int getSize() const {
+        return m_size;
+    }
+
+    // 禁止拷贝构造和赋值，简化示例
+    Array(const Array&) = delete;
+    Array& operator=(const Array&) = delete;
+};
+
+int main() {
+    // 实例化一个存储 int 的 Array
+    Array<int> intArray(5);
+    for (int i = 0; i < intArray.getSize(); ++i) {
+        intArray[i] = i * 10;
+    }
+    std::cout << "Int Array: ";
+    for (int i = 0; i < intArray.getSize(); ++i) {
+        std::cout << intArray[i] << " "; // 输出: Int Array: 0 10 20 30 40
+    }
+    std::cout << std::endl;
+
+    // 实例化一个存储 double 的 Array
+    Array<double> doubleArray(3);
+    doubleArray[0] = 3.14;
+    doubleArray[1] = 2.71;
+    doubleArray[2] = 1.41;
+    std::cout << "Double Array: ";
+    for (int i = 0; i < doubleArray.getSize(); ++i) {
+        std::cout << doubleArray[i] << " "; // 输出: Double Array: 3.14 2.71 1.41
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+```
+
+如果成员函数的定义在类体外，必须再次声明为模板，并且作用域解析符要写成`ClassName<T>::`。
+
+```cpp
+template <typename T>
+T& Array<T>::operator[](int index) {
+    // ... 实现
+}
+```
+
+### 模板的工作原理
+
+两个编译阶段
+
+1. **模板定义检查**，只进行一些与类型定义无关的检查。例如，检查模板语法是否正确，是否有不匹配的括号、缺少分号等。
+
+2. **模板实例化**
+
+   a. 当编译器遇到一个模板的**具体使用**时（如`mySwap(x, y)`或`Array<int>`），它会进行模板参数推导。
+
+   b. 用推导出的具体类型（如`int`）去替换模板中的所有`T`，生成一个完整的、具体的**函数或类定义**。这个过程叫做**实例化**。
+
+   c. **这时，编译器才会对实例化后的代码进行完整的、与类型相关的检查。** 如果`T`是`int`，它就检查`int`是否支持`=`操作。如果`T`是一个自定义类`MyClass`，它就检查`MyClass`是否有拷贝赋值运算符。
+
+由于模板的实例化需要看到完整的模板定义，所以C++标准规定，**模板的定义（而不仅仅是声明）通常必须放在头文件中**。
+
+- **原因**：当你在`main.cpp`中使用`Array<int>`时，编译器需要`Array`类的完整定义来生成`Array<int>`的代码。如果`Array`的成员函数定义在一个单独的`.cpp`文件（如`Array.cpp`）中，那么编译`main.cpp`的编译单元就看不到这些定义，无法实例化，会导致链接错误。
+- **实践**：因此，我们习惯将类模板及其所有成员函数的定义都写在同一个头文件（`.h`或`.hpp`）中。这就是所谓的“包含模型”。
+
+### 模板的非类型参数
+
+模板参数不仅可以是类型（`typename T`），还可以是**值**。这被称为非类型模板参数。非类型参数通常是整型（`int`, `size_t`）、枚举、指针或引用。最常见的就是整型，用来指定大小。改进上面的`Array`类，让数组的大小在编译时就确定下来，而不是在运行时通过构造函数传入。
+
+数组大小在编译时确定，可以在栈上分配内存，避免了堆分配（`new`/`delete`）的开销，速度更快。
+
+大小是类型的一部分，`StaticArray<int, 5>`和`StaticArray<int, 10>`是两种完全不同的类型，编译器可以防止将它们混用。
+
+**标准库中的例子**：`std::array`就是一个典型的非类型参数模板：`std::array<int, 10>`。
+
+```cpp
+#include <iostream>
+
+// 模板参数列表现在有两个：
+// T: 类型参数，表示元素类型
+// N: 非类型参数，表示数组大小，它是一个 size_t 类型的常量
+template <typename T, size_t N>
+class StaticArray {
+private:
+    T m_data[N]; // 在栈上分配一个固定大小的数组
+
+public:
+    // 不再需要构造函数指定大小，大小由 N 决定
+    // 析构函数也不需要了，因为 m_data 在栈上自动管理
+
+    T& operator[](int index) {
+        // 可以移除运行时大小检查，因为大小在编译时已知
+        // 但为了安全，可以保留
+        if (index < 0 || index >= N) {
+            // 简单处理，实际中应抛出异常
+            exit(1);
+        }
+        return m_data[index];
+    }
+
+    int getSize() const {
+        return N;
+    }
+};
+
+int main() {
+    // 实例化时，必须同时提供类型和大小
+    StaticArray<int, 5> intArray; // 创建一个包含5个int的静态数组
+
+    for (int i = 0; i < intArray.getSize(); ++i) {
+        intArray[i] = i * 10;
+    }
+
+    std::cout << "Static Int Array: ";
+    for (int i = 0; i < intArray.getSize(); ++i) {
+        std::cout << intArray[i] << " "; // 输出: Static Int Array: 0 10 20 30 40
+    }
+    std::cout << std::endl;
+
+    // 编译器知道 N 的值，可以进行编译时优化
+    // 例如，循环展开等
+    // StaticArray<double, 10> doubleArray;
+
+    return 0;
+}
+```
+
+### 模板中的特化
+
+特化的语法：名字后面跟一个`<>`，里面放特化的类型。
+
+用于处理非常规的特定类型。
+
+#### 模板函数特化
+
+```cpp
+template <typename T>
+void print(T value) {
+	std::cout << "通用打印: " << value << std::endl;
+}
+
+// 针对 const char* 的特化版本
+// 语法: template<> 返回类型 function_name<具体类型>(参数列表)
+template<>
+void print<const char*>(const char* value) {
+    std::cout << "C风格字符串特化打印: " << static_cast<const void*>(value) << std::endl;
+}
+
+// 注意：现代C++更倾向于使用函数重载而不是函数模板特化，因为重载的规则更直观、更少陷阱。上面的例子用重载写会更简单：
+void print(const char* value) { // 直接重载一个 const char* 版本
+    std::cout << "C风格字符串重载打印: " << static_cast<const void*>(value) << std::endl;
+}
+
+int main() {
+    int i = 123;
+    print(i); // 调用通用版本
+
+    const char* str = "Hello";
+    print(str); // 调用 const char* 的特化版本
+
+    return 0;
+}
+
+```
+
+#### 类模板特化
+
+全特化是针对某个固定参数组和的特化，偏特化是一类类型组和的特化。
+
+```cpp
+// 通用版本
+template <typename T1, typename T2>
+class Pair {
+private:
+    T1 first;
+    T2 second;
+public:
+    Pair(T1 f, T2 s) : first(f), second(s) {}
+    void print() {
+        std::cout << "通用 Pair: (" << first << ", " << second << ")" << std::endl;
+    }
+};
+
+// 针对 Pair<bool, bool> 的全特化
+template<> // 表示这是一个特化
+class Pair<bool, bool> { // 指定所有模板参数的具体类型
+private:
+    // 可以用更高效的方式存储，比如用一个 byte 的两个 bit
+    bool m_first;
+    bool m_second;
+public:
+    Pair(bool f, bool s) : m_first(f), m_second(s) {}
+    void print() {
+        std::cout << "特化 Pair<bool, bool>: (" 
+                  << std::boolalpha << m_first << ", " 
+                  << std::boolalpha << m_second << ")" << std::endl;
+    }
+};
+
+// 偏特化：当两个参数都是指针时
+template <typename T1, typename T2> // 参数列表变了，现在是两个基础类型
+class Pair<T1*, T2*> { // 特化声明，表示我们特化的是 T1* 和 T2*
+private:
+    T1* first;
+    T2* second;
+public:
+    Pair(T1* f, T2* s) : first(f), second(s) {}
+    void print() {
+        std::cout << "指针 Pair 偏特化: (" << *first << ", " << *second << ")" << std::endl;
+    }
+};
+
+int main() {
+    Pair<int, double> p1(10, 3.14);
+    p1.print(); // 调用通用版本
+
+    Pair<bool, bool> p2(true, false);
+    p2.print(); // 调用 Pair<bool, bool> 的特化版本
+    
+    int a = 100;
+    double b = 2.718;
+    Pair<int*, double*> p3(&a, &b);
+    p3.print(); // 调用指针偏特化版本
+
+    return 0;
+}
+```
+
+### 类模板作为函数参数
+
+```cpp
+template <typename T>
+class Box {
+private:
+    T m_content;
+public:
+    Box(T content) : m_content(content) {}
+    T getContent() const { return m_content; }
+};
+
+template <typename U>
+void printBoxByValue(Box<U>& box) { // 注意这里是按值传递
+    std::cout << "Box Content (by value): " << box.getContent() << std::endl;
+}
+```
+
+### 类模板与继承
+
+派生类不是类模板
+
+```cpp
+// 基类：一个通用的数组类模板
+template <typename T>
+class Array {
+protected:
+    T* m_data;
+    size_t m_size;
+public:
+    Array(size_t size) : m_size(size), m_data(new T[size]) {}
+    virtual ~Array() { delete[] m_data; } // 虚析构函数是好习惯
+
+    // 提供基本访问接口
+    T& operator[](size_t index) {
+        if (index >= m_size) throw std::out_of_range("Index out of range");
+        return m_data[index];
+    }
+    const T& operator[](size_t index) const {
+        if (index >= m_size) throw std::out_of_range("Index out of range");
+        return m_data[index];
+    }
+    size_t getSize() const { return m_size; }
+};
+
+// 派生类：一个专门处理 int 数组的类，增加了统计功能
+// 它明确地继承自 Array<int>
+class IntStatisticArray : public Array<int> {
+public:
+    // 使用基类的构造函数 (C++11 特性)
+    using Array<int>::Array;
+
+    // 新增功能：计算数组元素的总和
+    int sum() const {
+        int total = 0;
+        for (size_t i = 0; i < this->m_size; ++i) { // 注意 this-> 的使用
+            total += this->m_data[i];
+        }
+        return total;
+    }
+
+    // 新增功能：计算数组的平均值
+    double average() const {
+        if (this->m_size == 0) return 0.0;
+        return static_cast<double>(sum()) / this->m_size;
+    }
+};
+```
+
+派生类是类模板
+
+```cpp
+// 派生类模板：一个安全的数组，它本身也是一个模板
+template <typename T>
+class SafeArray : public Array<T> {
+public:
+    using Array<T>::Array; // 继承构造函数
+
+    // 新增安全的访问方法
+    void set(size_t index, const T& value) {
+        if (index >= this->m_size) throw std::out_of_range("Set: Index out of range");
+        this->m_data[index] = value;
+    }
+
+    T get(size_t index) const {
+        if (index >= this->m_size) throw std::out_of_range("Get: Index out of range");
+        return this->m_data[index];
+    }
+};
+```
+
+### 类模板函数类外实现
+
+```cpp
+// 1. 类模板的声明
+template <typename T> // 或 template <class T>
+class MyClass {
+public:
+    void memberFunction(T param); // 成员函数在类内声明
+};
+
+// 2. 成员函数在类外实现
+// 格式：template <...> 返回类型 类名<T>::函数名(参数列表) { ... }
+template <typename T>
+void MyClass<T>::memberFunction(T param) {
+    // 函数体实现
+    // ...
+}
+```
+
+### 类模板分文件编写
+
+```cpp
+/* classxx.hpp */
+#pragma once
+#include <iostream>
+#include <string>
+
+// 1. 类模板的声明
+template <typename T> // 或 template <class T>
+class MyClass {
+public:
+    void memberFunction(T param); // 成员函数在类内声明
+};
+
+// 2. 成员函数在类外实现
+// 格式：template <...> 返回类型 类名<T>::函数名(参数列表) { ... }
+template <typename T>
+void MyClass<T>::memberFunction(T param) {
+    // 函数体实现
+    // ...
+}
+```
+
+### 类模板与友元
+
+全局函数类内实现
+
+```cpp
+template <typename T1, typename T2>
+class Person {
+    friend void printPerson(Person<T1, T2> p)
+    {
+        std::cout << "姓名" << p.m_Name << "年龄" << p.m_Age << std::endl;
+    }
+public:
+    Person(T1 name, T2 age)
+    {
+        m_Name = name;
+        m_Age  = m_Age;
+    }
+    T1 m_Name;
+    T2 m_Age;
+}
+```
+
+全局函数类外实现
+
+```cpp
+template <typename T1, typename T2>
+class Person;
+
+// 函数模板的函数实现
+template <typename T1, typename T2>
+void printPerson(Person<T1, T2> p)
+{
+    std::cout << "姓名" << p.m_Name << "年龄" << p.m_Age << std::endl;
+}
+
+template <typename T1, typename T2>
+class Person {
+    // 函数模板的函数声明，需要让编译器提前知道有这么一个模板存在
+    friend void printPerson<>(Person<T1, T2> p);
+    
+public:
+    Person(T1 name, T2 age)
+    {
+        m_Name = name;
+        m_Age  = m_Age;
+    }
+    T1 m_Name;
+    T2 m_Age;
+}
+```
+
+
+
