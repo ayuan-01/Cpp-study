@@ -2149,7 +2149,7 @@ STL大概有六类：容器，算法，迭代器，伪函数，适配器，空�
 
 常用的容器有动态数组，栈，队列等。
 
-容器可以分为序列容器，关联容器，无序容器三类。
+容器可以分为**序列容器**，**关联容器**，**无序容器**三类。
 
 1. 序列容器有动态数组，双端队列，双向链表，单向链表等。
 
@@ -2253,6 +2253,64 @@ for (auto rit = vec.rbegin(); rit != vec.rend(); ++rit) {
     std::cout << *rit << " ";
 }
 ```
+
+## string
+
+```cpp
+// 初始化
+string s1;                // 空字符串
+string s2 = "Hello";       // 直接赋值
+string s3("World");        // 构造函数初始化
+string s4(5, 'A');         // "AAAAA"（重复字符）
+
+s.size();
+s.empty();
+
+s1 = "C++";                // 直接赋值
+
+s.append(" C++"); 
+s.insert(5, "Java ");
+
+// find(): 判断是否包含字串，返回首次出现的索引（未找到返回 string::npos）
+size_t pos = s.find("World");
+if (pos != string::npos)
+
+pos = s.rfind("l");           // 最后一次出现 'l' 的索引（输出 9）
+
+s.replace(6, 5, "C++");      // 从索引 6 开始替换 5 个字符 → "Hello C++"
+
+s.erase(5, 6);               // 从索引 5 开始删除 6 个字符 → "Hello"
+s.pop_back();                // 删除最后一个字符（C++11 起）
+
+string sub = s.substr(6, 5);  // 从索引 6 开始取 5 个字符 → "World"
+
+// 方法 1: 索引遍历
+for (size_t i = 0; i < s.size(); ++i) {
+    cout << s[i] << " ";  // H e l l o
+}
+
+// 方法 2: 范围 for 循环（C++11 起）
+for (char c : s) {
+    cout << c << " ";      // H e l l o
+}
+```
+
+###  输入输出
+
+```cpp
+// 读取单词（遇到空格停止）
+cout << "Enter a word: ";
+cin >> s;
+
+// 读取整行（包括空格）
+cout << "Enter a line: ";
+cin.ignore();  // 清除输入缓冲区中的换行符
+getline(cin, s);
+```
+
+
+
+
 
 ## vector
 
@@ -2383,7 +2441,233 @@ bool isValidParentheses(const string& s) {
 }
 ```
 
+## queue
+
+```cpp
+#include <queue>
+
+queue<int> q; // 声明一个存储int的queue
+queue<int, deque<int>> q1;  // 使用deque作为底层容器(默认)
+queue<int, list<int>> q2;   // 使用list作为底层容器
+// 注意：queue不能使用vector作为底层容器
+
+q.empty();    // 检查队列是否为空
+q.size();     // 返回队列中元素数量
+
+q.push(10);   // 在队尾添加元素
+q.pop();      // 移除队首元素(不返回)
+
+q.front();    // 访问队首元素
+q.back();     // 访问队尾元素
+
+/****************************操作*************************************/
+queue<string> tasks;
+ 
+// 添加元素到队尾
+tasks.push("Write code");
+tasks.push("Compile");
+tasks.push("Test");
+tasks.push("Debug");
+ 
+// 查看队列大小
+cout << "Queue size: " << tasks.size() << endl;
+ 
+// 访问队首和队尾元素
+cout << "First task: " << tasks.front() << endl;
+cout << "Last task: " << tasks.back() << endl;
+
+// 处理队列中的任务
+while (!tasks.empty()) {
+    cout << "Processing: " << tasks.front() << endl;
+    tasks.pop(); // 移除已处理的任务
+}
+```
+
+## set
+
+在 C++ 中，`std::set` 是一个**有序关联容器**，存储**唯一**的元素，并自动按升序（默认）或自定义顺序排序。它基于**红黑树（Red-Black Tree）**实现，支持高效的插入、删除和查找操作（时间复杂度均为 ***O*(log*n*)**）。
+
+```cpp
+#include <set>
+
+// 默认升序排序
+set<int> s1 = {3, 1, 4, 1, 5, 9, 2, 6};
+set<int, greater<int>> s2 = {3, 1, 4, 1, 5, 9, 2, 6};// 降序
+
+
+set<int> s;
+s.insert(3);  // {3}
+s.insert(1);  // {1, 3}
+s.insert(4);  // {1, 3, 4}
+s.insert(1);  // 重复元素不会被插入
+
+s.erase(3);  // 删除值为 3 的元素
+s.erase(s.begin());  // 删除迭代器指向的元素
+
+if (s.find(4) != s.end()) {}	// 查找
+if (s.count(1)) {}
+
+for (auto it = s.begin(); it != s.end(); ++it) {}	// 遍历
+for (int x : s) {}
+```
+
+## map
+
+在 C++ 中，**`std::map`** 是一个基于**红黑树（Red-Black Tree）**实现的有序关联容器，它存储**键值对**（`key-value`），并按照键的**升序排列**（默认使用 `std::less<Key>` 比较）。`std::map` 提供 *O*(log*n*) 时间复杂度的插入、删除和查找操作，适用于需要有序遍历的场景。
+
+注意的点：
+
+1. 键值唯一
+2. 元素默认按**键的升序**排列
+
+```cpp
+#include <map>
+
+map<string, int> wordCount;		// 键为string，值为int
+
+wordCount["apple"] = 5;			// 插入数据
+wordCount["banana"] = 3;
+wordCount["orange"] = 7;
+
+// 初始化列表方式
+map<string, int> scores = {
+    {"Alice", 90},
+    {"Bob", 85},
+    {"Charlie", 95}
+};
+
+m.size()
+m.empty()
+    
+
+// 插入元素
+m["apple"] = 10;
+m.insert({"banana", 20});
+m.insert(make_pair("cherry", 30));
+m.emplace("date", 40);
+
+// 访问元素
+cout << m["apple"] << endl;
+auto it = m.find("cherry");
+if (it != m.end()) { cout << "cherry: " << it->second << endl; }
+	// it->first 就是 Key（键）；it->second 就是 Value（值）
+
+// 遍历
+for (const auto& pair : m) {
+    cout << pair.first << ": " << pair.second << endl;
+}
+for (auto it = m.begin(); it != m.end(); ++it) {
+    cout << it->first << " -> " << it->second << endl;
+}
+
+for (auto rit = m.rbegin(); rit != m.rend(); ++rit) {
+    cout << rit->first << " = " << rit->second << endl;
+}
+
+// 删除
+m.erase("apple");  // 按键删除
+m.erase(m.begin());  // 按迭代器删除
+m.erase(m.begin(), m.find("cherry"));  // 删除范围 [begin, cherry)
+m.clear()
+
+// 判断
+if (m.count("banana") > 0) {
+    cout << "banana exists!" << endl;
+}
+if (m.find("cherry") != m.end()) {
+    cout << "cherry exists!" << endl;
+}
+
+```
+
+- **`std::map`** 适用于需要**有序遍历**的场景，如按字母顺序存储单词。
+- **`std::unordered_map`** 适用于需要**快速查找**的场景，如字典、缓存。
 
 
 
+## unordered_map & unordered_set
+
+无序关联容器
+
+| 特性           | `std::unordered_map`       | `std::unordered_set`       |
+| -------------- | -------------------------- | -------------------------- |
+| **底层实现**   | 哈希表（链地址法）         | 哈希表（链地址法）         |
+| **时间复杂度** | 平均 *O*(1)，最坏 *O*(*n*) | 平均 *O*(1)，最坏 *O*(*n*) |
+| **是否有序**   | ❌ 无序                     | ❌ 无序                     |
+| **键是否唯一** | 键唯一（值可重复）         | 键唯一（无值）             |
+| **适用场景**   | 快速查找、缓存、字典       | 快速去重、集合运算         |
+| **头文件**     | `#include <unordered_map>` | `#include <unordered_set>` |
+
+```cpp
+#include <unordered_map>
+
+unordered_map<string, int> wordCount;
+
+wordCount["apple"] = 5;
+
+unordered_map<string, int> scores = {
+    {"Alice", 90},
+    {"Bob", 85},
+    {"Charlie", 95}
+};
+
+m.insert({"banana", 20});
+m.insert(make_pair("cherry", 30));
+m.emplace("date", 40);
+
+cout << m["apple"] << endl;
+cout << m.at("banana") << endl;
+
+auto it = m.find("cherry");
+if (it != m.end()) {
+    cout << "cherry: " << it->second << endl;
+}
+
+for (const auto& pair : m) {
+    cout << pair.first << ": " << pair.second << endl;
+}
+for (auto it = m.begin(); it != m.end(); ++it) {
+    cout << it->first << " -> " << it->second << endl;
+}
+
+m.erase("apple");  // 按键删除
+m.erase(m.begin());  // 按迭代器删除
+
+
+if (m.count("banana") > 0) {
+    cout << "banana exists!" << endl;
+}
+if (m.find("cherry") != m.end()) {
+    cout << "cherry exists!" << endl;
+}
+```
+
+```cpp
+#include <unordered_set>
+
+unordered_set<string> fruits = {"apple", "banana", "orange"};
+
+fruits.insert("cherry");
+fruits.emplace("date");
+
+if (fruits.count("banana")) {
+    cout << "banana exists!" << endl;
+}
+
+// 遍历（顺序不确定！）
+for (const auto& fruit : fruits) {
+    cout << fruit << endl;
+}
+
+fruits.erase("apple");  // 删除 "apple"
+fruits.erase(fruits.begin());  // 删除第一个元素（顺序不确定！）
+```
+
+
+
+
+
+
+
+## emplace
 
