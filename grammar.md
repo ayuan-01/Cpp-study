@@ -2143,3 +2143,247 @@ public:
 
 
 
+# STL容器
+
+STL大概有六类：容器，算法，迭代器，伪函数，适配器，空间配置器。
+
+常用的容器有动态数组，栈，队列等。
+
+容器可以分为序列容器，关联容器，无序容器三类。
+
+1. 序列容器有动态数组，双端队列，双向链表，单向链表等。
+
+```cpp
+std::vector std::deque std::list std::forward_list
+```
+
+2. 关联容器有集合和映射
+
+```cpp
+std::set std::map
+td::multiset std::multimap
+// 它们分别是 set 和 map 的变体，唯一的区别是允许键重复。
+```
+
+3. 无序容器有set 和 map 的无序版本。
+
+```cpp
+std::unordered_set  std::unordered_map
+```
+
+## 容器适配器
+
+容器适配器不是完整的容器，它们是基于其他容器实现的，提供了特定的接口，限制了容器的功能。
+
+```cpp
+/*
+1. std::stack - 栈
+特点：后进先出。
+默认底层容器：deque。
+核心操作：push() (入栈), pop() (出栈), top() (访问栈顶)。
+2. std::queue - 队列
+特点：先进先出。
+默认底层容器：deque。
+核心操作：push() (入队), pop() (出队), front() (访问队首), back() (访问队尾)。
+3. std::priority_queue - 优先队列
+特点：元素被赋予优先级，访问时总是优先级最高的元素先出队（默认是最大堆）。
+默认底层容器：vector。
+核心操作：push() (插入), pop() (移除顶部元素), top() (访问顶部元素)。
+*/
+```
+
+容器选择：
+
+```cpp
+/*
+如何选择合适的容器？
+这是一个非常实际的问题，可以参考下面的决策流程：
+
+需要“后进先出”或“先进先出”的行为吗？
+是：使用 stack 或 queue。
+否：继续。
+需要根据键快速查找值（字典功能）吗？
+是：
+需要元素按键排序吗？是 -> 用 map / multimap。
+不需要排序，只追求最快查找速度？是 -> 用 unordered_map / unordered_multimap。
+否：继续。
+需要存储一组唯一的元素，并快速判断元素是否存在吗？
+是：
+需要元素自动排序吗？是 -> 用 set / multiset。
+不需要排序，只追求最快查找速度？是 -> 用 unordered_set / unordered_multiset。
+否：继续。
+主要操作是随机访问（通过下标访问元素）吗？
+是：首选 std::vector。它在几乎所有情况下都是最佳选择。
+否：继续。
+是否需要在序列的头部和尾部都高效地插入/删除元素？
+是：用 std::deque。
+否：继续。
+是否需要在序列的中间位置频繁地插入/删除元素，并且不关心随机访问？
+是：用 std::list 或 std::forward_list。
+否：回到第 4 步，std::vector 通常是默认的最佳选择。
+总结：
+
+默认首选 vector：它的性能在大多数场景下都非常出色，尤其是缓存友好性。
+需要字典/集合：如果需要排序，用 map/set；如果追求极致速度，用 unordered_map/unordered_set。
+需要双端操作：用 deque。
+需要中间频繁插入/删除：用 list。
+需要特定数据结构：用 stack, queue, priority_queue。
+*/
+```
+
+## 迭代器的常用函数
+
+```cpp
+#include <iterator>
+
+std::list<int> lst = {1, 2, 3};
+auto it = lst.begin();
+advance(it, 2); // it 指向 3
+
+auto it_next = next(it, 2); // 返回 it + 2
+auto it_prev = prev(it, 1); // 返回 it - 1
+
+int dist = distance(v.begin(), v.end()); // 返回容器大小
+
+auto it = vec.begin();
+auto cit = vec.cbegin(); // const 迭代器
+
+// 反向迭代器
+for (auto rit = vec.rbegin(); rit != vec.rend(); ++rit) {
+    std::cout << *rit << " ";
+}
+```
+
+## vector
+
+```cpp
+#include <vector>
+vector<int> vec; // 声明一个存储int的vector
+vector<int> v1; // 空vector
+vector<int> v2(5); // 5个元素，默认初始化为0
+vector<int> v3(5, 10); // 5个元素，初始化为10
+vector<int> v4 = {1, 2, 3, 4, 5}; // 初始化列表
+vector<int> v5(v4.begin(), v4.end()); // 从其他容器复制
+
+v.size();     					// 返回元素数量
+v.empty();    					// 是否为空
+
+v.push_back(10); 				// 在末尾添加元素
+v.pop_back();    				// 删除末尾元素
+
+v.insert(v.begin() + 2, 99); 	// 在指定位置插入
+
+v.erase(v.begin() + 1); 		// 删除指定位置元素
+v.clear(); 						// 清空所有元素
+
+v[0];       // 访问元素（不检查边界）
+v.at(0);    // 访问元素（检查边界，越界抛出异常）
+v.front();  // 第一个元素
+v.back();   // 最后一个元素
+
+for (vector<int>::iterator it = v.begin(); it != v.end(); ++it) {
+    cout << *it << " ";
+}
+
+for (auto num : v) {
+    cout << num << " ";
+}
+```
+
+## list
+
+```cpp
+#include <list>
+
+list<int> myList; 					// 声明一个存储int的list
+list<int> l1; 						// 空list
+list<int> l2(5); 					// 5个元素，默认初始化为0
+list<int> l3(5, 10); 				// 5个元素，初始化为10
+list<int> l4 = {1, 2, 3, 4, 5}; 	// 初始化列表
+list<int> l5(l4.begin(), l4.end()); // 从其他容器复制
+
+l.size();     		// 返回元素数量
+l.empty();    		// 是否为空
+
+l.push_back(10);  	// 在末尾添加元素
+l.push_front(5);  	// 在头部添加元素
+l.pop_back();     	// 删除末尾元素
+l.pop_front();   	// 删除头部元素
+
+auto it = l.begin();
+
+// list不能随机访问，因此需要借助迭代器进行插入数据
+l.insert(it, 99); // 在开头插入99
+l.insert(next(it, 2), 88); // 在第3个位置插入88
+
+l.erase(it); // 删除指定位置元素
+l.clear();   // 清空所有元素
+
+l.front();  // 第一个元素
+l.back();   // 最后一个元素
+
+for (list<int>::iterator it = l.begin(); it != l.end(); ++it) {
+    cout << *it << " ";
+}
+
+// C++11 起更简洁的写法
+for (auto num : l) {
+    cout << num << " ";
+}
+
+l.remove(5); 									// 删除所有等于5的元素
+l.remove_if([](int n){ return n % 2 == 0; }); 	// 删除所有偶数
+ 
+l.unique(); 									// 删除相邻的重复元素（需先排序）
+ 
+l.sort(); 										// *排序（默认升序）
+l.sort(greater<int>()); 						// *降序排序
+ 
+l.merge(anotherList); 							// 合并两个已排序的list
+l.splice(it, anotherList); 						// 将anotherList剪接到it位置前
+l.reverse();						 			// 反转链表
+```
+
+## stack
+
+```cpp
+#include <stack>
+stack<int> s; // 声明一个存储int的stack
+
+stack<int, vector<int>> s1; // 使用vector作为底层容器
+stack<int, list<int>> s2;   // 使用list作为底层容器
+stack<int, deque<int>> s3;  // 使用deque作为底层容器(默认)
+
+s.empty();    // 检查栈是否为空
+s.size();     // 返回栈中元素数量
+
+s.push(10);   // 压入元素到栈顶
+s.pop();      // 移除栈顶元素(不返回)
+
+s.top();      // 访问栈顶元素
+```
+
+```cpp
+// 括号匹配检查 
+// default: 判断栈是否为空：如果栈为空，说明前面没有开括号与之匹配，直接返回 false。
+// 判断栈顶元素是否等于当前字符：如果不相等，说明括号类型不匹配，返回 false。
+bool isValidParentheses(const string& s) {
+    stack<char> st;
+    for (char c : s) {
+        switch (c) {
+            case '(': st.push(')'); break;
+            case '[': st.push(']'); break;
+            case '{': st.push('}'); break;
+            default:
+                if (st.empty() || st.top() != c) return false;
+                st.pop();
+        }
+    }
+    return st.empty();
+}
+```
+
+
+
+
+
