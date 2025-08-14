@@ -271,7 +271,7 @@ v.push_back(stu1);
 
 ## 封装
 
-- 封装是将数据和操作数据的方法捆绑到一个单元中。对外部隐藏对象的内部实现细节，仅通过有限受控的接口与外部进行交互。
+- 封装是将**数据**和操作数据的**方法**捆绑到一个单元中。对外部隐藏对象的内部实现细节，仅通过有限受控的接口与外部进行交互。
 
 - 通过访问限定符实现封装
 
@@ -538,7 +538,7 @@ public:
 
 释放资源、自动调用、不能重载、先构造的对象后析构，后构造的对象先析构。
 
-如果在构造函数中使用了**new**，那么就需要在析构函数中显式定义一个析构函数来释放这些资源。如果不定义，那么默认的析构函数只会消除指针本身，而不会释放指针指向的内存。
+**如果在构造函数中使用了new，那么就需要在析构函数中显式定义一个析构函数来释放这些资源**。如果不定义，那么默认的析构函数只会消除指针本身，而不会释放指针指向的内存。
 
 `delete[]`操作符专门用于释放`new[]`创建的动态数组。
 
@@ -790,7 +790,7 @@ int main() {
 
 ### this指针
 
-既然成员函数在内存中只有一份，那调用不同对象的成员函数时，函数内部是如何区分要操作哪个对象呢。
+既然**成员函数在内存中只有一份**，那调用不同对象的成员函数时，函数内部是如何区分要操作哪个对象呢。
 
 当调用一个非静态成员函数时，编译器会隐式地把调用该函数的对象的地址指针作为第一个参数传递进去，这就是`this`指针，类型是`className* const`。obj1.show()在编译器看来更像是show(&obj1)。
 
@@ -841,9 +841,9 @@ MyClass::StaticFunction();  // 直接通过类名调用
 
 ### 虚函数
 
-虚函数是在基类中使用 `virtual` 关键字声明的成员函数。它允许你在派生类中对该函数进行**重写（Override）**，并且当你通过基类的指针或引用来调用该函数时，程序会**动态地**根据指针或引用实际所指向的对象类型，来调用相应派生类中的版本，而不是基类的版本。
+虚函数是在基类中使用 `virtual` 关键字声明的成员函数。**它允许你在派生类中对该函数进行重写（Override）**，并且当你通过基类的指针或引用来调用该函数时，程序会**动态地**根据指针或引用实际所指向的对象类型，来调用相应派生类中的版本，而不是基类的版本。
 
-核心目的是实现运行时多态，也成为动态绑定，就是用一个统一的接口，去处理多种不同类型的对象。
+核心目的是实现**运行时多态**，也成为动态绑定，就是用一个统一的接口，去处理多种不同类型的对象。
 
 ```cpp
 #include <iostream>
@@ -965,7 +965,6 @@ std::ostream& operator<<(std::ostream& os, const Vector& v) {
     os << "(" << v.x << ", " << v.y << ")";
     return os;
 }
-
 
 std::istream& operator>>(std::istream& is, Vector& v) {
     is >> v.x >> v.y;
@@ -1456,7 +1455,7 @@ int main() {
 
 ## 多态
 
-核心思想：同一个函数调用，作用于不同的对象，会产生不同的行为。
+核心思想：**同一个**函数调用，作用于**不同的**对象，会产生不同的行为。
 
 静态多态：也称为编译时多态。在程序编译期间就确定了具体要调用哪个函数。主要通过**函数重载**和**模板**实现。
 
@@ -1468,25 +1467,25 @@ int main() {
 
 ### 虚指针和虚函数表
 
-当一个类中存在至少一个虚函数时，编译器会为这个类创建一个虚函数表。这个表是一个静态的、函数指针的数组。
+当一个类中存在至少一个虚函数时，编译器会**为这个类**创建一个虚函数表。这个表是一个**静态的**、函数指针的数组。
 
-虚指针时在创建含虚函数的类的对象时，编译器在对象的内存布局中插入的一个额外指针`vptr`指向该对象所属类的虚函数表。
+虚指针时在创建含虚函数的**类的对象**时，编译器在对象的内存布局中插入的一个额外指针**`vptr`**指向该对象所属类的虚函数表。
 
 编译时：
-1. 编译器为Base类创建一个虚函数表，Base::speak()的地址被放入表中。
-2. 编译器为Derived类也创建一个虚函数表。由于Derived重写了speak()，所以Derived::speak()的地址被放入表中，覆盖了从基类继承来的位置。
-3. 当创建Base对象时，其vptr指向Base的虚函数表。
-4. 当创建Derived对象时，其vptr指向Derived的虚函数表。
+1. 编译器为`Base`类创建一个虚函数表，`Base::speak()`的地址被放入表中。
+2. 编译器为`Derived`类也创建一个虚函数表。由于`Derived`重写了`speak()`，所以`Derived::speak()`的地址被放入表中，覆盖了从基类继承来的位置。
+3. 当创建`Base`对象时，其`vptr`指向`Base`的虚函数表。
+4. 当创建`Derived`对象时，其`vptr`指向`Derived`的虚函数表。
 
 运行时：
 当你通过基类指针`ptr`调用`ptr->speak()`时，程序并不会在编译时就硬编码要调用`Base::speak()`。
-1. 获取ptr所指向的对象。
-2. 找到该对象内部的vptr。
-3. 通过vptr找到对应的虚函数表。
-4. 在虚函数表中，找到speak()函数对应的条目。
+1. 获取`ptr`所指向的对象。
+2. 找到该对象内部的`vptr`。
+3. 通过`vptr`找到对应的虚函数表。
+4. 在虚函数表中，找到`speak()`函数对应的条目。
 5. 调用该条目中存储的函数地址。
 
-因为ptr在运行时可能指向Base对象，也可能指向Derived对象，所以它内部的vptr也就分别指向了不同的虚函数表，从而最终调用了不同版本的speak()函数。这就是“动态绑定”或“迟绑定”的精髓。
+因为`ptr`在运行时可能指向`Base`对象，也可能指向`Derived`对象，所以它内部的`vptr`也就分别指向了不同的虚函数表，从而最终调用了不同版本的`speak()`函数。这就是“动态绑定”或“迟绑定”的精髓。
 
 ```cpp
 #include <iostream>
@@ -1890,7 +1889,6 @@ int main() {
 
     return 0;
 }
-
 ```
 
 #### 类模板特化
@@ -2254,7 +2252,7 @@ for (auto rit = vec.rbegin(); rit != vec.rend(); ++rit) {
 }
 ```
 
-## string
+## string（字符串）
 
 ```cpp
 // 初始化
@@ -2306,13 +2304,17 @@ cin >> s;
 cout << "Enter a line: ";
 cin.ignore();  // 清除输入缓冲区中的换行符
 getline(cin, s);
+
+// 读取带空格的字符串
+getline(cin, s);
+
+// 分别读取两个单词
+std::cin >> s;  				// 读取第一个单词（可选）
+std::cin.ignore();  			// 跳过空格
+std::getline(std::cin, s1);  	// 读取剩余部分（包括空格）
 ```
 
-
-
-
-
-## vector
+## vector（序列）
 
 ```cpp
 #include <vector>
@@ -2348,7 +2350,7 @@ for (auto num : v) {
 }
 ```
 
-## list
+## list（双向链表）
 
 ```cpp
 #include <list>
@@ -2402,7 +2404,7 @@ l.splice(it, anotherList); 						// 将anotherList剪接到it位置前
 l.reverse();						 			// 反转链表
 ```
 
-## stack
+## stack（栈）
 
 ```cpp
 #include <stack>
@@ -2441,7 +2443,7 @@ bool isValidParentheses(const string& s) {
 }
 ```
 
-## queue
+## queue（队列）
 
 ```cpp
 #include <queue>
@@ -2483,7 +2485,7 @@ while (!tasks.empty()) {
 }
 ```
 
-## set
+## set（有序关联容器）
 
 在 C++ 中，`std::set` 是一个**有序关联容器**，存储**唯一**的元素，并自动按升序（默认）或自定义顺序排序。它基于**红黑树（Red-Black Tree）**实现，支持高效的插入、删除和查找操作（时间复杂度均为 ***O*(log*n*)**）。
 
@@ -2511,7 +2513,7 @@ for (auto it = s.begin(); it != s.end(); ++it) {}	// 遍历
 for (int x : s) {}
 ```
 
-## map
+## map（有序哈希）
 
 在 C++ 中，**`std::map`** 是一个基于**红黑树（Red-Black Tree）**实现的有序关联容器，它存储**键值对**（`key-value`），并按照键的**升序排列**（默认使用 `std::less<Key>` 比较）。`std::map` 提供 *O*(log*n*) 时间复杂度的插入、删除和查找操作，适用于需要有序遍历的场景。
 
@@ -2583,9 +2585,7 @@ if (m.find("cherry") != m.end()) {
 - **`std::map`** 适用于需要**有序遍历**的场景，如按字母顺序存储单词。
 - **`std::unordered_map`** 适用于需要**快速查找**的场景，如字典、缓存。
 
-
-
-## unordered_map & unordered_set
+## unordered_map & unordered_set（键值对&单值）
 
 无序关联容器
 
@@ -2663,11 +2663,192 @@ fruits.erase("apple");  // 删除 "apple"
 fruits.erase(fruits.begin());  // 删除第一个元素（顺序不确定！）
 ```
 
+## priority_queue（默认最大堆）
 
+```cpp
+#include <queue>  // 包含 priority_queue 的定义
 
+//最小堆
+std::priority_queue<int, std::vector<int>, std::greater<int>> min_pq;
 
+// 默认最大堆
+// 自定义实现最小堆的方法
+class Solution {
+public:
+    static bool cmp(pair<int, int>& m, pair<int, int>& n) {
+        return m.second > n.second;
+    }
+    // 最小堆
+    priority_queue<
+        pair<int, int>,
+        vector<pair<int, int>>,
+        decltype(&cmp)
+    > q(cmp);
+};
+```
 
-
+| 操作         | 说明                   | 示例                      |
+| ------------ | ---------------------- | ------------------------- |
+| `pq.push(x)` | 插入元素 `x`           | `pq.push(10);`            |
+| `pq.pop()`   | 删除堆顶元素           | `pq.pop();`               |
+| `pq.top()`   | 返回堆顶元素（不删除） | `int max = pq.top();`     |
+| `pq.empty()` | 检查队列是否为空       | `if (pq.empty()) { ... }` |
+| `pq.size()`  | 返回队列大小           | `int n = pq.size();`      |
 
 ## emplace
+
+```cpp
+std::vector<std::pair<int, std::string>> vec;
+vec.emplace_back(42, "hello");  // 直接构造 pair，无需临时对象
+vec.push_back(std::make_pair(42, "hello"));  // 需要构造临时 pair
+
+std::deque<std::string> dq;
+dq.emplace_back("world");  // 直接构造字符串
+dq.emplace_front("hello"); // 直接构造字符串
+
+std::list<std::pair<int, int>> lst;
+lst.emplace(lst.begin(), 1, 2);  // 在头部直接构造 pair(1, 2)
+
+std::set<std::string> s;
+s.emplace("apple");  // 直接构造字符串
+s.insert(std::string("apple"));  // 需要构造临时对象
+
+std::map<int, std::string> m;
+m.emplace(1, "one");  // 直接构造 pair(1, "one")
+m.insert(std::make_pair(1, "one"));  // 需要构造临时 pair
+
+std::unordered_set<std::string> us;
+us.emplace("banana");  // 直接构造字符串
+
+std::unordered_map<int, std::string> um;
+um.emplace(2, "two");  // 直接构造 pair(2, "two")
+
+std::stack<std::pair<int, int>> stk;
+stk.emplace(1, 2);  // 直接构造 pair(1, 2)
+
+std::priority_queue<std::pair<int, int>> pq;
+pq.emplace(3, 4);  // 直接构造 pair(3, 4)
+```
+
+# 算法
+
+```c++
+#include <algorithm>
+
+std::reverse(words.begin(), words.end());	// 可以反转各种数据类型
+std::swap(arr[i], arr[j]);					// 数据交换
+
+sort(v.begin(), v.end());               	// 升序
+sort(v.begin(), v.end(), greater<int>()); 	// 降序
+stable_sort(v.begin(), v.end());
+
+auto it = find(v.begin(), v.end(), 8);
+if (it != v.end()) cout << "Found";
+
+sort(v.begin(), v.end());
+if (binary_search(v.begin(), v.end(), 8)) cout << "Yes"; //有序区间二分查找
+
+auto it1 = lower_bound(v.begin(), v.end(), 8);
+auto it2 = upper_bound(v.begin(), v.end(), 8);
+
+int a = 3, b = 7;
+cout << min(a, b) << " " << max(a, b);
+
+auto it_min = min_element(v.begin(), v.end());
+auto it_max = max_element(v.begin(), v.end());
+
+rotate(v.begin(), v.begin() + 2, v.end()); // 左旋2位
+
+sort(v.begin(), v.end());
+auto it = unique(v.begin(), v.end());
+v.erase(it, v.end());
+
+// 数值运算
+#include <numeric>
+
+int sum = accumulate(v.begin(), v.end(), 0);			// 求和
+
+vector<int> res;
+partial_sum(v.begin(), v.end(), back_inserter(res));	// res = [a, a+b, a+b+c, a+b+c+d]
+// back_inserter是一个迭代器适配器。当你向这个迭代器“赋值”时（比如 *it = value），它不会覆盖某个已有位置的值，而是会自动调用 res.push_back(value)，将这个新值 value 追加（append）到 res 的末尾。
+
+// 因为 res 一开始是空的！如果我们直接使用 res.begin() 作为目标，partial_sum 尝试向一个空容器的起始位置写入数据，会导致未定义行为（通常是程序崩溃）。back_inserter 解决了这个问题：它告诉 partial_sum：“你每算出一个结果，就把它当作一个新元素，添加到 res 的屁股后面去。” 这样，res 会自动增长，完美地容纳所有计算结果。
+```
+
+
+
+# 其他
+
+## stringstream
+
+`std::stringstream`是C++标准库中的一个类。用于项标准输入输出流一样读写字符串数据。
+
+```c++
+#include <sstream>
+
+std::string s("hello world");
+std::stringstream ss(s);
+std::string word;
+std::vector<std::string> words;
+
+while (ss >> word) {
+    words.push_back(word);
+}
+
+std::cout << words[0] << words[1];
+// 在vector<std::string> words(2) 的情况下可以使用words[i]=word;赋值，不然在没有分配空间的时候赋值会发生错误
+```
+
+
+
+## reinterpret_cast<new_type>(expression)
+
+```cpp
+// 强制类型转换
+// 指针类型转换
+int num = 65;
+char* p = reinterpret_cast<char*>(&num);  // int* 转 char*
+
+// 整数转换为指针
+uintptr_t addt = 0x12345678;
+int* ptr = reinterpret_cast<int*>(addr);
+
+// 不相关类型之间的转换
+struct A { int x; };
+struct B { int y; };
+A a{10};
+B* b = reinterpret_cast<B*>(&a);
+cout << b->y << endl;  // 输出 10，数据本身没变，只是按 B 的布局去读。
+```
+
+## setprecision
+
+```cpp
+// 保留两位小数
+#include <iomanip>  // 需要引入
+
+float num = 3.14159;
+cout << fixed << setprecision(2) << num << endl;  // 输出 3.14
+// fixed：以定点格式输出
+// setprecision(2)：保留 2 位小数
+```
+
+## iomanip
+
+```cpp
+// setprecision(n) —— 设置有效数字或小数位数
+float num = 3.14159;	// 不加 fixed：控制的是有效数字位数
+cout << fixed << setprecision(2) << num << endl;  // 输出 3.14
+
+// 输出对齐操作
+cout << left  << setw(10) << 42 << endl;   // 左对齐
+cout << right << setw(10) << 42 << endl;   // 右对齐
+cout << internal << setw(10) << -42 << endl; // 符号在最左，数字右对齐
+cout << setw(8) << setfill('0') << 42 << endl; // 00000042
+
+// 进制输出
+cout << hex << 255 << endl; // ff
+cout << dec << 255 << endl; // 255
+cout << oct << 255 << endl; // 377
+```
 
