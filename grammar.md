@@ -29,9 +29,9 @@ vector<int> numbers = {1, 2, 3};
 <string>	字符串类 std::string
 <vector>	向量容器（动态数组）
 <algorithm>	排序、查找、最大最小值等算法
-<cmath>	数学函数：pow, sqrt, sin, 等
+<cmath>		数学函数：pow, sqrt, sin, 等
 <cstdlib>	随机数生成、内存分配等
-<ctime>	时间函数如 time, clock 等
+<ctime>		时间函数如 time, clock 等
 <fstream>	文件流：读写文件
 ```
 
@@ -2623,6 +2623,7 @@ if (it != m.end()) {
     cout << "cherry: " << it->second << endl;
 }
 
+
 for (const auto& pair : m) {
     cout << pair.first << ": " << pair.second << endl;
 }
@@ -2640,6 +2641,10 @@ if (m.count("banana") > 0) {
 if (m.find("cherry") != m.end()) {
     cout << "cherry exists!" << endl;
 }
+
+// 给键添加值
+unordered_map<string, vector<string>> m;
+m[sorted_s].push_back(s);
 ```
 
 ```cpp
@@ -2850,5 +2855,52 @@ cout << setw(8) << setfill('0') << 42 << endl; // 00000042
 cout << hex << 255 << endl; // ff
 cout << dec << 255 << endl; // 255
 cout << oct << 255 << endl; // 377
+
+// 十六进制操作
+std::cout << std::uppercase << std::hex << x << std::endl; // FF
+std::cout << std::showbase << std::hex << x << std::endl;  // 0xff
+```
+
+## extern "C"
+
+告诉C++编译器按照C语言的规则处理函数的声明和定义。
+
+1. 在C++文件中使用C函数
+
+```cpp
+// 在 C++ 文件中声明C函数
+extern "C" {
+    #include "c_library.h" // 假设这是 C 语言的头文件
+}
+
+// 确保只有C++编译器会处理extern "C"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void cpp_function_for_c(int x); // C 兼容的函数声明
+
+#ifdef __cplusplus
+}
+#endif
+```
+
+2. 在C文件中使用C++定义的函数
+
+```cpp
+// C++文件中定义C兼容函数。cpp_file.cpp
+#include <iostream>
+ 
+extern "C" void hello_from_cpp() {
+    std::cout << "Hello from C++!" << std::endl;
+}
+
+// c_file.c
+void hello_from_cpp(); // 声明为 C 函数
+ 
+int main() {
+    hello_from_cpp(); // 调用 C++ 函数
+    return 0;
+}
 ```
 
