@@ -1,41 +1,117 @@
-# C++基本语法
+# CPP 学习笔记
 
-- 变量，数据类型
+> 秋招的时候（嵌入式方向）面试官常问到 C++，因此花了几天过了一下基础知识，本文为学习笔记。快速学习的经验：如果有其他语言基础的情况下，想要学习一门新语言，让 AI 帮你列一下这个语言的学习大纲或者目录，然后针对目录中的每个知识点让 AI 讲解并给出示例，这样非常快就能学完一门语言，当然这只是个人的速成经验，如果要熟练掌握一门语言还是要脚踏实地的一个个知识点去学习练习。
+
+# 目录
+
+- [一、C++ 基本语法](#section1)
+- [二、面向对象](#section2)
+- [三、STL容器](#section3)
+- [四、算法](#section4)
+- [五、其他](#section5)
+- [结语](#section6)
+
+# 一、C++ 基本语法{#section1}
+
+> 如果之前没有接触过面向对象语言的话，在学习 C++ 之前需要先建立一些概念和思想，不然可能连基础 Hello World 程序都会疑惑，比如 `std :: cout`是什么意思。
+
+在 C 语言中，全局作用域内不允许出现两个同名的函数。C++ 通过引入**命名空间**和**类**，巧妙地解决了这个问题。它们就像是给标识符（函数、变量等）加上了“姓氏”或“地址”，从而避免了命名冲突。具体到类的概念：每个类都定义了一个独立的**作用域**。因此，在不同的类中，完全可以定义名称、参数和返回值都完全相同的成员函数。在调用时，为了明确指出我们想调用的是哪个类中的函数，就需要使用类名来限定，格式通常为 `类名::函数名` 或通过对象来调用。**`::`**表示作用域解析运算符，用于指明空间或者类的作用域。
+
+比如下面的例子，理解思想即可，具体语法接下来慢慢学习。
 
 ```cpp
-bool flag = true;
+#include <iostream>
+
+// 定义一个 Dog（狗）类
+class Dog {
+public:
+    // Dog 类中的 speak 函数
+    void speak() {
+        std::cout << "汪汪！" << std::endl;
+    }
+};
+
+// 定义一个 Cat（猫）类
+class Cat {
+public:
+    // Cat 类中的 speak 函数（与 Dog 类中的函数同名同参数同返回类型）
+    void speak() {
+        std::cout << "喵喵！" << std::endl;
+    }
+};
+
+int main() {
+    // 创建 Dog 类和 Cat 类的对象
+    Dog myDog;
+    Cat myCat;
+
+    // 调用函数时，通过对象来区分所属的类
+    std::cout << "狗说：";
+    myDog.speak(); // 调用的是 Dog::speak()
+
+    std::cout << "猫说：";
+    myCat.speak(); // 调用的是 Cat::speak()
+
+    return 0;
+}
 ```
 
-- 命名空间的概念
+## 1.1 变量
 
-最常用的是标准库的命名空间了。在C++项目中，同一个函数名称可能会在不同的文件中多次出现，为了解决这种命名冲突，就有了命名空间的概念。std是C++标准库的命名空间，是一个庞大的工具集。
+这里只介绍一下 C++ 风格字符串，因为跟 C 语言有所区别。
+
+其实下面的例子会涉及到很多知识点，大家先有个印象，知道 C++ 字符串怎么定义初始化即可。
 
 ```cpp
-// 使用std命名空间的内容
-std::string
+#include <iostream>		// 基本输入输出头文件，相当于C的stdio
+#include <string> 		// 必须包含这个头文件
+using namespace std;	// 声明了 std 空间了之后，后面的 cout 等都不用再添加 std:: 了
 
-using std::cout;
-cout << "This is a message." << endl;
+int main() {
+    // 多种初始化方式
+    string s1;              // 默认初始化，空字符串 ""
+    string s2 = "Hello";    // 拷贝初始化
+    string s3("World");     // 直接初始化
+    string s4(5, 'A');      // 初始化由5个'A'组成的字符串 "AAAAA"
+    string s5(s2);          // 用s2初始化s5，s5内容为 "Hello"
 
+    cout << "s1: " << s1 << endl;
+    cout << "s2: " << s2 << endl;
+    cout << "s3: " << s3 << endl;
+    cout << "s4: " << s4 << endl;
+    cout << "s5: " << s5 << endl;
+
+    return 0;
+}
+```
+
+## 1.2 命名空间
+
+前面有介绍过。在 C++ 项目中，同一个函数名称可能会在不同的文件中多次出现，为了解决这种命名冲突，就有了命名空间的概念。std是 C++ 标准库的命名空间，是一个庞大的工具集。
+
+```cpp
+// 不使用命名空间，在使用 std 中的工具时都需要加前缀，如
+std::cout << " " << endl;
+
+// 使用了命名空间之后，不用加前缀，默认是使用 std 空间中的工具
 using namespace std; 
-cout << greeting << "World!" << endl;
-vector<int> numbers = {1, 2, 3};
+cout << " " << endl;
 ```
 
-- 常用头文件
+## 1.3 常用头文件
 
 ```cpp
-<iostream>	输入输出：cin, cout
-<string>	字符串类 std::string
-<vector>	向量容器（动态数组）
-<algorithm>	排序、查找、最大最小值等算法
-<cmath>		数学函数：pow, sqrt, sin, 等
-<cstdlib>	随机数生成、内存分配等
-<ctime>		时间函数如 time, clock 等
-<fstream>	文件流：读写文件
+<iostream>			// 输入输出：cin, cout
+<string>			// 字符串类 std::string
+<vector>			// 向量容器（动态数组）
+<algorithm>			// 排序、查找、最大最小值等算法
+<cmath>				// 数学函数：pow, sqrt, sin, 等
+<cstdlib>			// 随机数生成、内存分配等
+<ctime>				// 时间函数如 time, clock 等
+<fstream>			// 文件流：读写文件
 ```
 
-- 输入输出操作
+## 1.4 输入输出操作
 
 ```c
 std::cin >> age;
@@ -53,13 +129,13 @@ std::cout << x;      // 全局的x
 std::cout << A::x;   // A类中的x
 ```
 
-1. **`::`**表示作用域解析运算符，用于指明空间或者类的作用域。
+1. **cout **对象表述标准输出流。
 
-2. **cout**对象表述标准输出流。
+2. **cin **对象表示标准输入流。
 
-3. **cin**对象表示标准输入流。
+## 1.5 引用
 
-引用: 引用就是某个变量的**别名**，它**并不独立地占用内存**，而是直接**绑定到另一个已有的变量**。你对引用做的任何操作，实际上就是对原变量的操作。
+引用就是某个变量的**别名**，它**并不独立地占用内存**，而是直接**绑定到另一个已有的变量**。你对引用做的任何操作，实际上就是对原变量的操作，区别于 C 语言的指针。
 
 ```cpp
 int a = 10;
@@ -80,12 +156,9 @@ int& getRef(int& x) {
 for (int& n : vec) {
     n += 1; // 修改 vec 中的元素
 }
-
 ```
 
-## 常用关键字，数据类型，运算符
-
-关键字
+## 1.6 常用关键字
 
 ```cpp
 /* 类与面向对象 */
@@ -118,98 +191,109 @@ std::string	字符串（C++类）
 
 - new
 
+  核心功能是在堆上分配内存，并返回指向该内存的一个指针。销毁使用delete。主要功能有两个：
 
-核心功能是在堆上分配内存，并返回指向该内存的一个指针。销毁使用delete。主要功能有两个：
-1. 为单个对象分配内存。
-2. 为数组分配内存。
+  1. 为单个对象分配内存。、
+  2. 为数组分配内存。
+
+   ```cpp
+   // 为单个对象分配内存
+   pointer = new TypeName;
+   pointer = new TypeName(initial_value);
+   
+   // new运算符会首先向操作系统申请一块足够存储`TypeName`类型的内存。如果内存分配成功会自动调用这个对`TypeName`类型的构造函数，在这块新分配的内存中初始化一个对象。
+   
+   // 基于此，接下来介绍一下什么是构造函数
+   // 对于一个类class Person，在该类型的对创建时（new）构造函数会被自动调用，为该对象赋初值。
+   // 构造函数可重载（参数列表不同即可）
+   // 构造函数名必须与类名一致
+   /** 
+    * pref: 构造函数举例
+    */
+   #include <iostream>
+   #include <string>
+   
+   class Person {
+   public:
+       // 默认构造函数（无参数）
+       Person() {
+           name = "Unknown";
+           age = 0;
+           std::cout << "Default constructor called." << std::endl;
+       }
+   
+       // 带参数的构造函数
+       Person(std::string n, int a) {
+           name = n;
+           age = a;
+           std::cout << "Parameterized constructor called." << std::endl;
+       }
+   
+       void display() {
+           std::cout << "Name: " << name << ", Age: " << age << std::endl;
+       }
+   
+   private:
+       std::string name;
+       int age;
+   };
+   
+   int main() {
+       Person p1;             // 调用默认构造函数
+       Person p2("Alice", 30); // 调用带参数的构造函数
+   
+       p1.display();
+       p2.display();
+   
+       return 0;
+   }
+   // 分配数组
+   int* arr = new int[10]; // 分配并默认初始化10个int
+   delete[] arr;           // 正确释放数组
+   
+   // 自动计算大小
+   int* p = new int;
+   ```
+
+- new 和 melloc 的区别
+
+  1. new 可以**自动计算内存大小**。
+
+  2. new 可以自动调用**构造函数**，delete 可以自动调用析构函数。
+
+  3. new 返回正确类型的指针，**无需强制类型转换**。
+
+## 1.7 分支结构
+
+与其他语言大差不差，不多介绍。
+
+## 1.8 数组
+
+C++ 兼容 C语言的数组操作，但一般不使用，下面是 C++ 风格的数组定义。
+
+这里只讲一些初始化的基本操作，更详细内容见[第四章 vector](#section44) 节。
 
 ```cpp
-// 为单个对象分配内存
-pointer = new TypeName;
-pointer = new TypeName(initial_value);
-
-// new运算符会首先向操作系统申请一块足够存储`TypeName`类型的内存。如果内存分配成功会自动调用这个对`TypeName`类型的构造函数，在这块新分配的内存中初始化一个对象。
-
-// 基于此，接下来介绍一下什么是构造函数
-// 对于一个类class Person，在该类型的对创建时（new）构造函数会被自动调用，为该对象赋初值。
-// 构造函数可重载（参数列表不同即可）
-// 构造函数名必须与类名一致
-/** 
- * pref: 构造函数举例
- */
-#include <iostream>
-#include <string>
-
-class Person {
-public:
-    // 默认构造函数（无参数）
-    Person() {
-        name = "Unknown";
-        age = 0;
-        std::cout << "Default constructor called." << std::endl;
-    }
-
-    // 带参数的构造函数
-    Person(std::string n, int a) {
-        name = n;
-        age = a;
-        std::cout << "Parameterized constructor called." << std::endl;
-    }
-
-    void display() {
-        std::cout << "Name: " << name << ", Age: " << age << std::endl;
-    }
-
-private:
-    std::string name;
-    int age;
-};
-
-int main() {
-    Person p1;             // 调用默认构造函数
-    Person p2("Alice", 30); // 调用带参数的构造函数
-
-    p1.display();
-    p2.display();
-
-    return 0;
-}
-// 分配数组
-int* arr = new int[10]; // 分配并默认初始化10个int
-delete[] arr;           // 正确释放数组
-
-// 自动计算大小
-int* p = new int;
-```
-
-- new和melloc的区别
-
-1. new可以自动计算内存大小
-2. new可以自动调用构造函数，delete可以自动调用析构函数
-3. new返回正确类型的指针，无需强制类型转换。
-
-## 分支结构
-
-同C语言
-
-## 数组，字符串，指针，函数，结构体
-
-数组
-
-```cpp
-/* 首先兼容C语言的数组操作 */
 #include <array>
 #include <vector>
+using namespace std;
 
 // std::array：固定长度
-std::array<int, 5> arr = {1,2,3,4,5};
+array<int, 5> arr = {1,2,3,4,5};
 
-// std::vector：动态数组
-std::vector<int> vec = {1,2,3};
-vec.push_back(4);
+// std::vector：动态数组，用的最多的
+// <>中的是数组存放的数据类型，可以是 char, int, long等
+// 更具体的使用见第四张的 vector 节。
+vector<int> v1; 			// 空vector
+vector<int> v2(5); 			// 5个元素，默认初始化为0
+vector<int> v3(5, 10); 		// 5个元素，初始化为10
+vector<int> vec = {1,2,3};
+
+v.push_back(10); 				// 在末尾添加元素
+v.pop_back();    				// 删除末尾元素
 ```
 
-字符串相关操作
+## 1.9 字符串
 
 ```c
 // 构造方式
@@ -241,7 +325,7 @@ s.begin() s.end()
 .push_back(c) 与 .append(...)：末尾添加字符或子串
 ```
 
-指针
+## 1.10 指针
 
 ```cpp
 int* p = nullptr;  // 空指针，避免野指针
@@ -249,155 +333,208 @@ int arr[3] = {1, 2, 3};
 int* p = arr;      // 等价于 int* p = &arr[0];
 ```
 
-函数
+## 1.11 函数
+
+1. 函数的基本定义与 C 语言相同，不再介绍。
+
+2. 函数重载
+
+   **函数重载** 允许在**同一个作用域**内，定义多个**同名**的函数，但这些函数的**参数列表必须不同**（要么参数类型不同，要么参数个数不同）。它的核心目的是：为执行**概念上相似**但操作**数据类型或数量不同**的任务，提供一个统一的函数接口，使得代码更直观、更易读。
+
+   ```cpp
+   #include <iostream>
+   using namespace std;
+   
+   // 重载函数：add
+   // 版本1：处理两个整数
+   int add(int a, int b) {
+       cout << "调用 int add(int, int)" << endl;
+       return a + b;
+   }
+   
+   // 版本2：处理两个浮点数
+   double add(double a, double b) {
+       cout << "调用 double add(double, double)" << endl;
+       return a + b;
+   }
+   
+   // 版本3：处理两个字符串（连接）
+   string add(const string& a, const string& b) {
+       cout << "调用 string add(const string&, const string&)" << endl;
+       return a + b;
+   }
+   
+   int main() {
+       cout << add(5, 3) << endl;       // 调用版本1，输出整数8
+       cout << add(2.5, 3.7) << endl;   // 调用版本2，输出浮点数6.2
+       cout << add("Hello, ", "World!") << endl; // 调用版本3，输出字符串 "Hello, World!"
+   
+       return 0;
+   }
+   ```
+
+## 1.12 结构体
 
 ```cpp
-// 内联函数 inline
-// 建议编译器把函数展开，适合小函数，减少函数调用的损耗
+#include <vector>
+#include <string>
 
-// 函数重载
-就是作用域内允许多个重名函数出现，但参数列表不同。
+struct student {
+    std::string name;  // 姓名
+    int age;           // 年龄  
+    double score;      // 分数
+};
+
+// 使用示例
+int main() {
+    std::vector<student> v;
+    
+    // 方式1：使用初始化列表直接构造
+    v.push_back({"Mike", 18, 75.0});
+    
+    // 方式2：先创建对象再添加
+    student stu1 = {"John", 20, 85.5};
+    v.push_back(stu1);
+    
+    // 方式3：使用emplace_back（更高效）
+  	// 注：emplace_back 是 C++ 新特性，在容器章节会常用到
+    v.emplace_back("Alice", 19, 92.0);
+    
+    return 0;
+}
 ```
 
-结构体
+# 二、面向对象{#section2}
 
-```cpp
-std::vector<Student> v;
-v.push_back({"Mike", 18, 75.0});
-v.push_back(stu1);
-```
-
-# 面向对象
-
-## 封装
+## 2.1 封装
 
 - 封装是将**数据**和操作数据的**方法**捆绑到一个单元中。对外部隐藏对象的内部实现细节，仅通过有限受控的接口与外部进行交互。
 
-- 通过访问限定符实现封装
+### 2.1.1 成员权限
 
-  - public、private、protected
+- public、private、protected
 
-  ```cpp
-  // public: 任何地方都可以访问。类的内部、子类、类的外部（通过对象）都可以直接访问public成员。
-  // private: 只能在类的内部访问。子类和类的外部都无法直接访问private成员。
-  // protected: 只能在类的内部和其派生类（子类）中访问。类的外部无法访问。为继承设计的“半私有”成员。
-  
-  #include <iostream>
-  #include <string>
-  
-  class BankAccount {
-  // --- 私有部分：数据和内部实现 ---
-  private:
-      // 数据成员（属性）被设为private，以保护它们
-      std::string ownerName;
-      double balance;
-      int accountNumber;
-  
-      // 一个私有辅助函数，用于内部记录日志，外部不需要知道
-      void logTransaction(const std::string& action, double amount) {
-          std::cout << "[LOG] Account " << accountNumber << ": " << action << " of " << amount << std::endl;
-      }
-  
-  
-  // --- 公共部分：对外接口 ---
-  public:
-      // 构造函数：用于创建和初始化对象
-      BankAccount(std::string name, int accNum, double initialDeposit) {
-          ownerName = name;
-          accountNumber = accNum;
-          // 即使是初始存款，也通过deposit方法，以保证逻辑统一
-          balance = 0; // 先设为0
-          deposit(initialDeposit); // 再调用存款方法
-          std::cout << "Account for " << ownerName << " created successfully." << std::endl;
-      }
-  
-      // 公共接口：存款
-      void deposit(double amount) {
-          if (amount > 0) {
-              balance += amount;
-              logTransaction("Deposit", amount);
-          } else {
-              std::cout << "Error: Deposit amount must be positive." << std::endl;
-          }
-      }
-  
-      // 公共接口：取款
-      void withdraw(double amount) {
-          if (amount <= 0) {
-              std::cout << "Error: Withdrawal amount must be positive." << std::endl;
-              return;
-          }
-          if (amount > balance) {
-              std::cout << "Error: Insufficient funds. Withdrawal failed." << std::endl;
-          } else {
-              balance -= amount;
-              logTransaction("Withdrawal", amount);
-          }
-      }
-  
-      // 公共接口：查询余额
-      // 注意：它返回一个副本，而不是balance的引用，防止外部通过引用修改
-      double getBalance() const {
-          return balance;
-      }
-      
-      // 公共接口：显示账户信息
-      void displayInfo() const {
-          std::cout << "------------------------" << std::endl;
-          std::cout << "Account Holder: " << ownerName << std::endl;
-          std::cout << "Account Number: " << accountNumber << std::endl;
-          std::cout << "Current Balance: " << balance << std::endl;
-          std::cout << "------------------------" << std::endl;
-      }
-  }; // 类定义结束
-  
-  int main() {
-      // 创建一个BankAccount对象
-      BankAccount myAccount("Alice", 12345678, 1000.0);
-      myAccount.displayInfo();
-  
-      // 通过公共接口进行操作
-      std::cout << "\n--- Attempting to deposit 500 ---" << std::endl;
-      myAccount.deposit(500.0);
-      myAccount.displayInfo();
-  
-      std::cout << "\n--- Attempting to withdraw 200 ---" << std::endl;
-      myAccount.withdraw(200.0);
-      myAccount.displayInfo();
-  
-      std::cout << "\n--- Attempting to withdraw 2000 (insufficient funds) ---" << std::endl;
-      myAccount.withdraw(2000.0);
-      myAccount.displayInfo();
-  
-      // --- 以下代码是错误的，无法通过编译，体现了封装的安全性 ---
-      // myAccount.balance = 1000000; // 错误！'double BankAccount::balance' is private
-      // myAccount.accountNumber = 999; // 错误！'int BankAccount::accountNumber' is private
-      // myAccount.logTransaction("Hacking", 0); // 错误！'void BankAccount::logTransaction(...)' is private
-  
-      return 0;
-  }
-  ```
+```cpp
+// public: 任何地方都可以访问。类的内部、子类、类的外部（通过对象）都可以直接访问public成员。
+// private: 只能在类的内部访问。子类和类的外部都无法直接访问private成员。
+// protected: 只能在类的内部和其派生类（子类）中访问。类的外部无法访问。为继承设计的“半私有”成员。
 
-  - const关键字
+#include <iostream>
+#include <string>
 
-    void displayInfo() const; 表示这个函数是只读的，不会修改对象的内容。
+class BankAccount {
+// --- 私有部分：数据和内部实现 ---
+private:
+    // 数据成员（属性）被设为private，以保护它们
+    std::string ownerName;
+    double balance;
+    int accountNumber;
 
-  - 构造函数的一种写法
-
-  ```cpp
-  class MyClass {
-  private:
-      int secret;
-  public:
-      MyClass(int s) : secret(s) {}
-      // 声明友元函数
-      friend void showSecret(const MyClass& obj);
-  };
-  // secret(s)表示将成员secret属性赋值为s
-  ```
+    // 一个私有辅助函数，用于内部记录日志，外部不需要知道
+    void logTransaction(const std::string& action, double amount) {
+        std::cout << "[LOG] Account " << accountNumber << ": " << action << " of " << amount << std::endl;
+    }
 
 
-### 友元
+// --- 公共部分：对外接口 ---
+public:
+    // 构造函数：用于创建和初始化对象
+    BankAccount(std::string name, int accNum, double initialDeposit) {
+        ownerName = name;
+        accountNumber = accNum;
+        // 即使是初始存款，也通过deposit方法，以保证逻辑统一
+        balance = 0; // 先设为0
+        deposit(initialDeposit); // 再调用存款方法
+        std::cout << "Account for " << ownerName << " created successfully." << std::endl;
+    }
+
+    // 公共接口：存款
+    void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            logTransaction("Deposit", amount);
+        } else {
+            std::cout << "Error: Deposit amount must be positive." << std::endl;
+        }
+    }
+
+    // 公共接口：取款
+    void withdraw(double amount) {
+        if (amount <= 0) {
+            std::cout << "Error: Withdrawal amount must be positive." << std::endl;
+            return;
+        }
+        if (amount > balance) {
+            std::cout << "Error: Insufficient funds. Withdrawal failed." << std::endl;
+        } else {
+            balance -= amount;
+            logTransaction("Withdrawal", amount);
+        }
+    }
+
+    // 公共接口：查询余额
+    // 注意：它返回一个副本，而不是balance的引用，防止外部通过引用修改
+    double getBalance() const {
+        return balance;
+    }
+    
+    // 公共接口：显示账户信息
+    void displayInfo() const {
+        std::cout << "------------------------" << std::endl;
+        std::cout << "Account Holder: " << ownerName << std::endl;
+        std::cout << "Account Number: " << accountNumber << std::endl;
+        std::cout << "Current Balance: " << balance << std::endl;
+        std::cout << "------------------------" << std::endl;
+    }
+}; // 类定义结束
+
+int main() {
+    // 创建一个BankAccount对象
+    BankAccount myAccount("Alice", 12345678, 1000.0);
+    myAccount.displayInfo();
+
+    // 通过公共接口进行操作
+    std::cout << "\n--- Attempting to deposit 500 ---" << std::endl;
+    myAccount.deposit(500.0);
+    myAccount.displayInfo();
+
+    std::cout << "\n--- Attempting to withdraw 200 ---" << std::endl;
+    myAccount.withdraw(200.0);
+    myAccount.displayInfo();
+
+    std::cout << "\n--- Attempting to withdraw 2000 (insufficient funds) ---" << std::endl;
+    myAccount.withdraw(2000.0);
+    myAccount.displayInfo();
+
+    // --- 以下代码是错误的，无法通过编译，体现了封装的安全性 ---
+    // myAccount.balance = 1000000; // 错误！'double BankAccount::balance' is private
+    // myAccount.accountNumber = 999; // 错误！'int BankAccount::accountNumber' is private
+    // myAccount.logTransaction("Hacking", 0); // 错误！'void BankAccount::logTransaction(...)' is private
+
+    return 0;
+}
+```
+
+- const关键字
+
+  void displayInfo() const; 表示这个函数是只读的，不会修改对象的内容。
+
+- 构造函数的一种写法
+
+```cpp
+class MyClass {
+private:
+    int secret;
+public:
+    MyClass(int s) : secret(s) {}
+    // 声明友元函数
+    friend void showSecret(const MyClass& obj);
+};
+// secret(s)表示将成员secret属性赋值为s
+```
+
+
+### 2.1.2 友元
 
 ```cpp
 // 友元函数：非成员函数可以访问类的私有成员
@@ -469,9 +606,9 @@ int main() {
 }
 ```
 
-## 构造函数和析构函数
+### 2.1.3 构造函数
 
-### 拷贝构造函数
+#### 拷贝构造函数
 
 默认构造函数，带参数的构造函数，初始化列表
 
@@ -481,7 +618,7 @@ int main() {
 
 **用于创建一个与现有对象完全相同的新对象**，它的参数是对同类对象的**常量引用const ClassName&**。如果没有定义拷贝构造函数，编译器会生成一个默认的拷贝构造函数，它会进行**浅拷贝**。
 
-### 浅拷贝
+#### 浅拷贝
 
 危险性：默认的浅拷贝在拷贝默认的指针成员的时候，只是拷贝一个指针，指针的内容不会被拷贝，这会导致调用析构函数的时候可能会重复释放同一块内存。
 
@@ -507,7 +644,7 @@ void problem_demo() {
 }
 ```
 
-### 深拷贝
+#### 深拷贝
 
 当类中包含指针成员或动态分配的资源时，你必须**显式地定义拷贝构造函数**，自己为新对象分配独立的内存并复制内容，这就是**深拷贝**（Deep Copy）。
 
@@ -534,7 +671,7 @@ public:
 };
 ```
 
-### 析构函数
+### 2.1.4 析构函数
 
 释放资源、自动调用、不能重载、先构造的对象后析构，后构造的对象先析构。
 
@@ -589,9 +726,7 @@ int main() {
 }
 ```
 
-
-
-### 类对象作为类成员和静态成员
+### 2.1.5 类对象作为类成员
 
 关键点是类对象的成员初始化列表。成员对象的构造顺序由它们**在类中的声明顺序决定**
 
@@ -677,7 +812,7 @@ int main() {
 }
 ```
 
-- 静态成员
+### 2.1.6 静态成员
 
 所有创建的对象都会自动拥有类定义中的静态成员变量
 
@@ -701,11 +836,11 @@ private:
 };
 ```
 
-## 成员变量与成员函数分开存储
+### 2.1.7 存储模型
 
-核心思想是数据与行为的分离。
+类的成员变量和成员函数分开存储的核心思想是数据与行为的分离。
 
-以一段代码为例，图解面向对象的内存模型。类成员函数存放在.text区域，非静态成员变量放在栈区，静态成员变量放在静态数据区。
+以一段代码为例，图解面向对象的内存模型。类成员函数存放在`.text`区域，非静态成员变量放在栈区，静态成员变量放在静态数据区。
 
 ```cpp
 #include <iostream>
@@ -788,7 +923,7 @@ int main() {
 | **访问机制**           | 直接通过对象地址访问                                         | **非静态**: 通过 `this` 指针隐式访问对象成员 **静态**: 无 `this` 指针，不能访问非静态成员 |
 | **对 `sizeof` 的影响** | **非静态**: 直接决定对象大小 **静态**: 无影响                | **所有函数**: 无影响                                         |
 
-### this指针
+### 2.1.8 this指针
 
 既然**成员函数在内存中只有一份**，那调用不同对象的成员函数时，函数内部是如何区分要操作哪个对象呢。
 
@@ -799,11 +934,11 @@ int main() {
 // 对于 obj2.show()，this 指向 obj2，所以 this->mA 就是 obj2.mA（值为30）。
 ```
 
-### 静态成员函数
+### 2.1.9 静态成员函数
 
 在 C++ 中，**静态成员函数（Static Member Function）** 是类的成员函数，但它不属于类的某个具体对象，而是属于类本身。静态成员函数可以直接通过类名调用，无需创建类的实例（对象），并且它只能访问类的**静态成员（静态变量或其他静态函数）**，不能直接访问非静态成员（普通变量或普通函数）。
 
-静态成员函数没有 `this` 指针，因此无法访问类的非静态成员（变量或函数），因为非静态成员属于对象实例。
+**静态成员函数没有 `this` 指针**，因此无法访问类的非静态成员（变量或函数），因为非静态成员属于对象实例。
 
 声明周期与类相同，静态成员函数在程序加载时就被初始化，直到程序结束才销毁。
 
@@ -818,7 +953,7 @@ public:
 MyClass::StaticFunction();  // 直接通过类名调用
 ```
 
-### 空指针访问成员函数
+#### 空指针访问成员函数
 
 核心思想是函数调用并不依赖与对象地址。成员函数是存放在代码区的，使用nullptr调用成员函数是可以调用的，只是传入的this指针是nullptr。
 
@@ -839,7 +974,7 @@ MyClass::StaticFunction();  // 直接通过类名调用
    e. 跳转到该地址执行函数。
    ```
 
-### 虚函数
+### 2.1.10 虚函数
 
 虚函数是在基类中使用 `virtual` 关键字声明的成员函数。**它允许你在派生类中对该函数进行重写（Override）**，并且当你通过基类的指针或引用来调用该函数时，程序会**动态地**根据指针或引用实际所指向的对象类型，来调用相应派生类中的版本，而不是基类的版本。
 
@@ -889,14 +1024,14 @@ int main() {
 }
 ```
 
-## C++运算符重载
+## 2.2 C++运算符重载
 
 什么是运算符重载：相对于某个class来说，重新定义已有的运算符，使得其工作在我们期待的情况下。例如
 ```cpp
 Vector v1(1, 2), v2(3, 4);
 Vector v3 = v1 + v2; // 希望实现向量相加
 ```
-#### 运算符重载的语法：
+#### 2.2.1 运算符重载的语法
 
 1. 成员函数的形式
 ```cpp
@@ -941,7 +1076,7 @@ Vector operator+(const Vector& a, const Vector& b) {
 }
 ```
 
-#### 常见运算符重载
+#### 2.2.2 常见运算符重载
 
 只要**某个表达式里出现了你自定义的类型，并且用到了某个运算符**，而**这个运算符对该类型没有现成的、可用的实现**，编译器就会去查找**是否存在针对该类型、该运算符的重载函数**。找到了就用，找不到就报错。
 
@@ -1044,7 +1179,7 @@ int main() {
 }
 ```
 
-#### 函数运算符重载
+#### 2.2.3 函数运算符重载
 
 ```cpp
 class Adder {
@@ -1061,7 +1196,7 @@ int result = add(3, 4); // 看起来像函数调用，实际是调用 operator()
 std::cout << Adder()(3, 4) << std::endl;
 ```
 
-## 继承
+## 2.3 继承
 
 概念：继承允许我们创建一个新类（派生类），这个新类会**继承**一个基类的**属性**和**行为**，实现代码的重用和类之间的层次关系。
 
@@ -1071,7 +1206,7 @@ std::cout << Adder()(3, 4) << std::endl;
 
 子类可以对父类的成员函数进行重写。虚函数的重写是为了实现多态。
 
-### 语法格式：
+### 2.3.1 语法格式
 
 ```cpp
 // class Manager : public Employee {
@@ -1146,13 +1281,13 @@ int main() {
 }
 ```
 
-### 继承方式
+### 2.3.2 继承方式
 
 有**公有，保护，私有**三种方式。继承方式决定了**基类中的成员**在**派生类中**的访问权限。**继承方式是为了限制“外部”对“基类部分”的访问，而不是限制派生类内部对基类成员的访问。**总之，派生类对基类的访问权限取决于基类和继承方式的最小权限。只有两个都是public时外部才能访问。
 
 无论哪种继承方式，**基类的 `private` 成员永远无法被派生类直接访问**。它们虽然被继承了（存在于派生类对象中），但对派生类来说是“不可见”的。派生类只能通过基类提供的 `public` 或 `protected` 接口来间接访问它们。
 
-### 继承中的构造和析构函数
+### 2.3.3 继承中的构造/析构函数
 
 构造函数和析构函数不能被继承，但是在创建派生类对象时，基类的构造函数会自动被调用。
 
@@ -1169,13 +1304,13 @@ Manager(std::string name, int id, double salary, double bonus)
 
 析构函数的调用顺序相反。
 
-### 继承的内存布局
+### 2.3.4 继承的内存布局
 
 **派生类对象包含了基类的所有非静态成员变量，以及派生类自己新增的非静态成员变量。**这些成员在内存中通常是连续存放的，基类的部分在前，派生类的部分在后。
 
 成员函数（包括虚函数）并不存储在每个对象中。它们存储在代码段。**每个对象中只存储一个指向虚函数表的指针**（如果类有虚函数），通过这个指针来找到正确的函数版本。
 
-### 继承中的静态成员
+### 2.3.5 继承中的静态成员
 
 **无论继承出多少个派生类，整个继承体系中只有一个静态成员的实例**。
 
@@ -1212,7 +1347,7 @@ int main() {
 }
 ```
 
-### 多继承和菱形继承问题
+### 2.3.7 多继承和菱形继承问题
 
 多继承会引入复杂性，最主要的问题是**命名冲突**。如果多个基类中有同名的成员，那么在派生类中访问时，必须使用作用域解析符来明确指出要访问哪个基类的成员。
 
@@ -1316,9 +1451,9 @@ int main() {
 - 这个指针指向一个**虚基类表**，表中记录了从当前对象位置到共享的虚基类（`Person`）子对象的偏移量。
 - 这样，无论通过 `Teacher` 还是 `Student` 的路径，都能通过查表找到同一个 `Person` 子对象。
 
-<img src="./Figure/virtual.png"  alt="菱形继承内存布局" width="1000">
+![virtual](https://img2024.cnblogs.com/blog/3519912/202511/3519912-20251107172615811-1749540253.png)
 
-### 同名成员
+### 2.3.8 同名成员
 
 分为同名成员变量的处理和同名成员函数的处理。
 
@@ -1453,7 +1588,7 @@ int main() {
 }    
 ```
 
-## 多态
+## 2.4 多态
 
 核心思想：**同一个**函数调用，作用于**不同的**对象，会产生不同的行为。
 
@@ -1465,7 +1600,7 @@ int main() {
 
 动态多态实现的三个关键要素：**继承，虚函数，基类指针或引用。**
 
-### 虚指针和虚函数表
+### 2.4.1 虚指针和虚函数表
 
 当一个类中存在至少一个虚函数时，编译器会**为这个类**创建一个虚函数表。这个表是一个**静态的**、函数指针的数组。
 
@@ -1566,19 +1701,19 @@ int main() {
 }
 ```
 
-### 虚析构函数
+### 2.4.2 虚析构函数
 
 如果一个基类的指针指向一个派生类的对象，当通过这个基类指针调用delete时，如果派生类的析构函数没有`virtual`，就无法清除派生类的资源。
 
 **黄金法则**：**如果一个类设计出来是为了被继承，并且它拥有虚函数，那么它的析构函数也必须是虚函数。**
 
-###  override和final关键字
+###  2.4.3 override 和 final 关键字
 
 override是一个说明符，说明当前函数是重写的基类的一个虚函数（编译器会对重写虚函数的正确与否进行检查）。
 
 final说明符，在函数后面告诉编译器不能被进一步的派生类重写。放在类名后，表示该类不能被继承。
 
-### 纯虚函数
+### 2.4.4 纯虚函数
 
 派生类必须对该函数进行重写。如果一个类中包含了至少一个纯虚函数，那么这个类就被称为**抽象类**。
 
@@ -1618,18 +1753,18 @@ ptr->draw(); // 调用 Circle::draw()
 delete ptr;
 ```
 
-### 多态的优势
+### 2.4.5 多态的优势
 
 1. 可扩展性：当你需要增加一个新的派生类时（比如增加一个`Bird`类），你只需要编写`Bird`类本身并实现它自己的`speak()`函数。**调用多态行为的代码（如`letAnimalSpeak`函数）完全不需要任何修改！** 这使得系统维护和升级变得异常轻松。
 2. 解耦：多态使得高层模块（调用方）只依赖于基类的抽象接口，而不依赖于具体的派生类实现。这大大降低了模块间的耦合度，符合“依赖倒置原则”（DIP）。
 3. 代码简洁与复用：你可以用统一的代码处理多种不同类型的对象，避免了大量的if-else或switch语句来进行类型判断和分支处理。代码更简洁，逻辑更清晰。
 4. 框架设计：几乎所有的大型C++框架（如Qt、MFC、游戏引擎等）都深度依赖多态。框架定义了一系列抽象基类（接口），用户通过继承这些基类并实现其虚函数，来将自己的代码“挂载”到框架中运行。
 
-## 模板
+## 2.5 模板
 
 **泛型编程：**泛型编程的思想是编写与类型无关的代码。意味着你可以编写一个通用的算法或数据结构，而不用预先指定它要操作的具体数据类型（如`int`, `double`, `string`等）。当你使用这个模板时，编译器会根据你提供的具体类型，自动生成一个对应类型的、可执行的代码版本。
 
-### 函数模板
+### 2.5.1 函数模板
 
 模板声明: `template <typename T>`，告诉编译器接下来的东西是一个模板。
 
@@ -1671,7 +1806,7 @@ int main() {
 2. 实例化：编译器使用`int`换掉所有的占位符`T`，生成一个全新的，专门处理`int`的函数。
 3. 编译这个新生成的函数。
 
-### 类模板
+### 2.5.2 类模板
 
 类模板允许定义一个与类型无关的类家族。最经典的例子就是标准库中的容器，如`std::vector`, `std::list`, `std::map`等。
 
@@ -1773,7 +1908,7 @@ T& Array<T>::operator[](int index) {
 }
 ```
 
-### 模板的工作原理
+### 2.5.3 模板的工作原理
 
 两个编译阶段
 
@@ -1792,7 +1927,7 @@ T& Array<T>::operator[](int index) {
 - **原因**：当你在`main.cpp`中使用`Array<int>`时，编译器需要`Array`类的完整定义来生成`Array<int>`的代码。如果`Array`的成员函数定义在一个单独的`.cpp`文件（如`Array.cpp`）中，那么编译`main.cpp`的编译单元就看不到这些定义，无法实例化，会导致链接错误。
 - **实践**：因此，我们习惯将类模板及其所有成员函数的定义都写在同一个头文件（`.h`或`.hpp`）中。这就是所谓的“包含模型”。
 
-### 模板的非类型参数
+### 2.5.4 模板的非类型参数
 
 模板参数不仅可以是类型（`typename T`），还可以是**值**。这被称为非类型模板参数。非类型参数通常是整型（`int`, `size_t`）、枚举、指针或引用。最常见的就是整型，用来指定大小。改进上面的`Array`类，让数组的大小在编译时就确定下来，而不是在运行时通过构造函数传入。
 
@@ -1854,7 +1989,7 @@ int main() {
 }
 ```
 
-### 模板中的特化
+### 2.5.5 模板中的特化
 
 特化的语法：名字后面跟一个`<>`，里面放特化的类型。
 
@@ -1954,7 +2089,7 @@ int main() {
 }
 ```
 
-### 类模板作为函数参数
+### 2.5.6 类模板作为函数参数
 
 ```cpp
 template <typename T>
@@ -1972,7 +2107,7 @@ void printBoxByValue(Box<U>& box) { // 注意这里是按值传递
 }
 ```
 
-### 类模板与继承
+### 2.5.7 类模板与继承
 
 派生类不是类模板
 
@@ -2045,7 +2180,7 @@ public:
 };
 ```
 
-### 类模板函数类外实现
+### 2.5.8 类模板函数类外实现
 
 ```cpp
 // 1. 类模板的声明
@@ -2064,7 +2199,7 @@ void MyClass<T>::memberFunction(T param) {
 }
 ```
 
-### 类模板分文件编写
+### 2.5.9 类模板分文件编写
 
 ```cpp
 /* classxx.hpp */
@@ -2088,7 +2223,7 @@ void MyClass<T>::memberFunction(T param) {
 }
 ```
 
-### 类模板与友元
+### 2.5.10 类模板与友元
 
 全局函数类内实现
 
@@ -2139,9 +2274,7 @@ public:
 }
 ```
 
-
-
-# STL容器
+# 三、STL容器{#section3}
 
 STL大概有六类：容器，算法，迭代器，伪函数，适配器，空间配置器。
 
@@ -2169,7 +2302,7 @@ td::multiset std::multimap
 std::unordered_set  std::unordered_map
 ```
 
-## 容器适配器
+## 3.1 容器适配器
 
 容器适配器不是完整的容器，它们是基于其他容器实现的，提供了特定的接口，限制了容器的功能。
 
@@ -2229,7 +2362,7 @@ std::unordered_set  std::unordered_map
 */
 ```
 
-## 迭代器的常用函数
+## 3.2 迭代器的常用函数
 
 ```cpp
 #include <iterator>
@@ -2252,7 +2385,7 @@ for (auto rit = vec.rbegin(); rit != vec.rend(); ++rit) {
 }
 ```
 
-## string（字符串）
+## 3.3 string（字符串）
 
 ```cpp
 // 初始化
@@ -2314,7 +2447,7 @@ std::cin.ignore();  			// 跳过空格
 std::getline(std::cin, s1);  	// 读取剩余部分（包括空格）
 ```
 
-## vector（序列）
+## 3.4 vector（序列）{#section44}
 
 ```cpp
 #include <vector>
@@ -2350,7 +2483,7 @@ for (auto num : v) {
 }
 ```
 
-## list（双向链表）
+## 3.5 list（双向链表）
 
 ```cpp
 #include <list>
@@ -2404,7 +2537,7 @@ l.splice(it, anotherList); 						// 将anotherList剪接到it位置前
 l.reverse();						 			// 反转链表
 ```
 
-## stack（栈）
+## 3.6 stack（栈）
 
 ```cpp
 #include <stack>
@@ -2443,7 +2576,7 @@ bool isValidParentheses(const string& s) {
 }
 ```
 
-## queue（队列）
+## 3.7 queue（队列）
 
 ```cpp
 #include <queue>
@@ -2485,7 +2618,7 @@ while (!tasks.empty()) {
 }
 ```
 
-## set（有序关联容器）
+## 3.8 set（有序关联容器）
 
 在 C++ 中，`std::set` 是一个**有序关联容器**，存储**唯一**的元素，并自动按升序（默认）或自定义顺序排序。它基于**红黑树（Red-Black Tree）**实现，支持高效的插入、删除和查找操作（时间复杂度均为 ***O*(log*n*)**）。
 
@@ -2513,7 +2646,7 @@ for (auto it = s.begin(); it != s.end(); ++it) {}	// 遍历
 for (int x : s) {}
 ```
 
-## map（有序哈希）
+## 3.9 map（有序哈希）
 
 在 C++ 中，**`std::map`** 是一个基于**红黑树（Red-Black Tree）**实现的有序关联容器，它存储**键值对**（`key-value`），并按照键的**升序排列**（默认使用 `std::less<Key>` 比较）。`std::map` 提供 *O*(log*n*) 时间复杂度的插入、删除和查找操作，适用于需要有序遍历的场景。
 
@@ -2585,7 +2718,7 @@ if (m.find("cherry") != m.end()) {
 - **`std::map`** 适用于需要**有序遍历**的场景，如按字母顺序存储单词。
 - **`std::unordered_map`** 适用于需要**快速查找**的场景，如字典、缓存。
 
-## unordered_map & unordered_set（键值对&单值）
+## 3.10 unordered_map & unordered_set（键值对&单值）
 
 无序关联容器
 
@@ -2668,7 +2801,7 @@ fruits.erase("apple");  // 删除 "apple"
 fruits.erase(fruits.begin());  // 删除第一个元素（顺序不确定！）
 ```
 
-## priority_queue（默认最大堆）
+## 3.11 priority_queue（默认最大堆）
 
 ```cpp
 #include <queue>  // 包含 priority_queue 的定义
@@ -2700,7 +2833,7 @@ public:
 | `pq.empty()` | 检查队列是否为空       | `if (pq.empty()) { ... }` |
 | `pq.size()`  | 返回队列大小           | `int n = pq.size();`      |
 
-## emplace
+## 3.12 emplace
 
 ```cpp
 std::vector<std::pair<int, std::string>> vec;
@@ -2735,7 +2868,7 @@ std::priority_queue<std::pair<int, int>> pq;
 pq.emplace(3, 4);  // 直接构造 pair(3, 4)
 ```
 
-# 算法
+# 四、算法{#section4}
 
 ```c++
 #include <algorithm>
@@ -2780,9 +2913,7 @@ partial_sum(v.begin(), v.end(), back_inserter(res));	// res = [a, a+b, a+b+c, a+
 // 因为 res 一开始是空的！如果我们直接使用 res.begin() 作为目标，partial_sum 尝试向一个空容器的起始位置写入数据，会导致未定义行为（通常是程序崩溃）。back_inserter 解决了这个问题：它告诉 partial_sum：“你每算出一个结果，就把它当作一个新元素，添加到 res 的屁股后面去。” 这样，res 会自动增长，完美地容纳所有计算结果。
 ```
 
-
-
-# 其他
+# 五、其他{#section5}
 
 ## stringstream
 
@@ -2824,18 +2955,6 @@ struct B { int y; };
 A a{10};
 B* b = reinterpret_cast<B*>(&a);
 cout << b->y << endl;  // 输出 10，数据本身没变，只是按 B 的布局去读。
-```
-
-## setprecision
-
-```cpp
-// 保留两位小数
-#include <iomanip>  // 需要引入
-
-float num = 3.14159;
-cout << fixed << setprecision(2) << num << endl;  // 输出 3.14
-// fixed：以定点格式输出
-// setprecision(2)：保留 2 位小数
 ```
 
 ## iomanip
@@ -2904,3 +3023,54 @@ int main() {
 }
 ```
 
+## climits
+
+| 宏        | 含义           | 典型值（32位系统） |
+| :-------- | :------------- | :----------------- |
+| `INT_MAX` | `int` 的最大值 | `2147483647`       |
+| `INT_MIN` | `int` 的最小值 | `-2147483648`      |
+|  `UINT_MAX`|`unsigned int`的最大值| `4294967295` |
+|`CHAR_BIT`	|一个 char 的位数（通常是 8）	|8|
+|`CHAR_MAX`	|char 的最大值	|127 或 255（取决于是否为 signed char）|
+|`CHAR_MIN`	|char 的最小值	|-128 或 0|
+| `SHRT_MAX`  | `short` 的最大值          | `32767`  |
+| `SHRT_MIN`  | `short` 的最小值          | `-32768` |
+| `USHRT_MAX` | `unsigned short` 的最大值 | `65535`  |
+| `LONG_MAX`  | `long` 的最大值          | `2147483647` 或更大  |
+| `LONG_MIN`  | `long` 的最小值          | `-2147483648` 或更小 |
+| `ULONG_MAX` | `unsigned long` 的最大值 | `4294967295` 或更大  |
+| `LLONG_MAX`  | `long long` 的最大值          | `9223372036854775807`  |
+| `LLONG_MIN`  | `long long` 的最小值          | `-9223372036854775808` |
+| `ULLONG_MAX` | `unsigned long long` 的最大值 | `18446744073709551615` |
+
+## 输入输出
+
+读取一个不定长序列
+
+```cpp
+vector<int> nums;
+int num;
+while (cin >> num) {  // 循环读取直到输入结束或非法输入
+    nums.push_back(num);
+}
+```
+
+整行读取
+
+```cpp
+string line;
+getline(cin, line);
+stringstream ss(line);
+int num;
+while (ss >> num) {
+    nums.push_back(num);
+}
+```
+
+# 结语{#section6}
+
+本文对 C++ 部分知识点进行了总结，学习过程中填填补补所以会有点乱，后续会持续补充整理。
+
+---
+
+*Steady progress!*

@@ -83,6 +83,9 @@ int main()
 }
 ```
 
+- C 的 `%s` 不会检查缓冲区大小，容易溢出。
+- 建议用 `%ns` 限制长度，或改用 `fgets` + `sscanf`。
+
 # C++文件操作
 
 1. C++ 提供了三种文件流类：
@@ -147,7 +150,7 @@ int mian()
         outFile << "这是第一行" << endl;
         outFile << "这是第二行" << endl;
         outFile << 123 << " " << 3.14 << endl;
-    }
+    }	
     
     // 文件位置指针
     streampos pos = inFile.tellg();		// 获取当前位置
@@ -171,6 +174,9 @@ int mian()
 	return 0;
 }
 ```
+
+- `>>` 读取后可能留下换行符在缓冲区，导致后续 `getline` 直接读取空行。
+- 解决方法：在 `>>` 后加 `cin.ignore()` 或 `inFile.ignore()`
 
 ## 临时文件
 
